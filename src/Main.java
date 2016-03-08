@@ -1,13 +1,15 @@
 import java.util.*;
 
 public class Main {
-
+	
+	public static TableList ct;
+	
 	public static void main(String[] argc){
 		String input_command;
 		
 		Scanner scanner = new Scanner(System.in);
 		Parser parser = new Parser();
-		TableList ct = new TableList();
+		ct = new TableList();
 		while(true){
 			input_command = scanner.nextLine();
 			parser.doParser(input_command);
@@ -23,7 +25,7 @@ public class Main {
 			
 			ct.addTable("tablename", s1, s2);
 			
-			ct.printtb();
+			//ct.printtb();
 			String[] s3 = new String[3];
 			s3[0] = "q";
 			s3[1] = "w";
@@ -33,8 +35,10 @@ public class Main {
 			s4[1] = "t";
 			s4[2] = "y";
 			ct.addTable("tablename2",s3,s4);
-			
 			ct.printtb();
+			
+			break;
+			
 			
 			
 		}

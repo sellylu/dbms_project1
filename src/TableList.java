@@ -39,16 +39,33 @@ public class TableList {
 		now_tb = null;
 	}
 	
+	
 	public void addTable(String tablename,String []colname,String []datatype){
 		if(head_tb == null){
 			head_tb = new table_node(tablename,colname,datatype);
 			now_tb = head_tb;
-			System.out.println("qq");
 		}else{
 			table_node tb2 = new table_node(tablename,colname,datatype);
 			now_tb.next_table = tb2;
 			now_tb = tb2;
 		}
+	}
+	
+	
+	//  return false when hit
+	public boolean checktablename(String name){
+		table_node tmp = head_tb;
+		System.out.println("haha");
+		
+		while(tmp != null){
+			if(tmp.tablename.equals(name)){
+				return false;
+			}
+			tmp = tmp.next_table;
+		}
+		
+		return true;
+		
 	}
 	
 	public void printtb(){

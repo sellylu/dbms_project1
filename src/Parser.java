@@ -34,6 +34,7 @@ public class Parser {
 			case sstcreatetable:
 				analyzeCreateStmt((TCreateTableSqlStatement)stmt);
 				
+				
 				break;
 		
 //			
@@ -59,9 +60,14 @@ public class Parser {
 		String tablename = stmt.getTableName().toString();
 		System.out.println("table name = " + tablename);
 		
+		// check table name 是否重複
+		if(Main.ct.checktablename(tablename));
+		
 		for(int i=0;i<stmt.getColumnList().size();i++){
 			System.out.println(stmt.getColumnList().getElement(i));
 		}
+		
+		
 		
 	}
 	

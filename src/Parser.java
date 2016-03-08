@@ -28,9 +28,12 @@ public class Parser {
 		switch(stmt.sqlstatementtype){
 			case sstinsert:
 				analyzeInsertStmt((TInsertSqlStatement)stmt);
+				
+				
 				break;
 			case sstcreatetable:
 				analyzeCreateStmt((TCreateTableSqlStatement)stmt);
+				
 				break;
 		
 //			

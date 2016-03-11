@@ -17,7 +17,7 @@ public class Main {
 			String command = "";
 			String[] tmp;
 			do {
-				String input = scanner.nextLine();
+				String input = scanner.nextLine().toLowerCase();
 				if(input.indexOf(";") > 0) {
 					tmp = input.split(";");
 					command = command.concat(tmp[0]);
@@ -31,22 +31,25 @@ public class Main {
 				}
 			} while(command.length() <= 1024);
 
-			parser = new Parser(command);
-			
-			// get command type in enum
-			switch(parser.r.getCommand()) {
-				case CreateTable:
-					CreateTable c = (CreateTable)parser.r;
-					System.out.println(c.name);
-					System.out.println(c.primaryKey);
-					System.out.println(c.dataType.toString());
-					System.out.println(c.attribute.toString());
-					break;
-				case Insert:
-					Insert i = (Insert)parser.r;
-					break;
-				default:
+			try {
+				parser = new Parser(command);
+				// get command type in enum
+				switch(parser.r.getCommand()) {
+					case CreateTable:
+						CreateTable c = (CreateTable)parser.r;
+						break;
+					case Insert:
+						Insert i = (Insert)parser.r;
+						System.out.println(i.name);
+						break;
+					default:
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+
 			
 			
 			

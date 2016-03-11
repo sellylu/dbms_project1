@@ -82,6 +82,24 @@ public class TableList {
 		
 	}
 	
+	public String checktabledatatype(String[] datatype){
+		String re = "";
+		int ifwrongdatatype = 0;
+		for(String data : datatype){
+			
+			if(data.contains("int")&&data.length()==3||data.contains("varchar")&&data.length()==7){
+				continue;
+			}else{
+				ifwrongdatatype = 1;
+				re = re + data + " ";
+			}
+		}
+		if(ifwrongdatatype == 1)
+			return re;
+		else
+			return null;
+	}
+	
 	
 	
 	public int returnPrimaryKeyIndex(table_node now_table){

@@ -37,10 +37,22 @@ public class Main {
 			switch(parser.r.getCommand()) {
 				case CreateTable:
 					CreateTable c = (CreateTable)parser.r;
-					System.out.println(c.name);
-					System.out.println(c.primaryKey);
-					System.out.println(c.dataType.toString());
-					System.out.println(c.attribute.toString());
+					if(ct.checktablename(c.name) == null){
+						String chdatatype;
+						if((chdatatype = ct.checktabledatatype(c.dataType)) == null){
+							ct.addTable(c.name,c.attribute, c.dataType,  c.primaryKey);
+							ct.printtb();
+						}else{
+							System.out.println(chdatatype + " is wrong datatype");
+						}
+						
+					}else{
+						System.out.println("已經存在此table");
+					}
+//					System.out.println(c.name);
+//					System.out.println(c.primaryKey);
+//					System.out.println(c.dataType.toString());
+//					System.out.println(c.attribute.toString());
 					break;
 				case Insert:
 					Insert i = (Insert)parser.r;

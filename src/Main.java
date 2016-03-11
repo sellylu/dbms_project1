@@ -17,7 +17,7 @@ public class Main {
 			String command = "";
 			String[] tmp;
 			do {
-				String input = scanner.nextLine();
+				String input = scanner.nextLine().toLowerCase();
 				if(input.indexOf(";") > 0) {
 					tmp = input.split(";");
 					command = command.concat(tmp[0]);
@@ -31,39 +31,38 @@ public class Main {
 				}
 			} while(command.length() <= 1024);
 
-			parser = new Parser(command);
-			
-			// get command type in enum
-			switch(parser.r.getCommand()) {
-				case CreateTable:
-					CreateTable c = (CreateTable)parser.r;
-					if(ct.checktablename(c.name) == null){
-						String chdatatype;
-						if((chdatatype = ct.checktabledatatype(c.dataType)) == null){
-							ct.addTable(c.name,c.attribute, c.dataType,  c.primaryKey);
-							ct.printtb();
+			try {
+				parser = new Parser(command);
+				// get command type in enum
+				switch(parser.r.getCommand()) {
+					case CreateTable:
+						CreateTable c = (CreateTable)parser.r;
+						if(ct.checktablename(c.name) == null){
+							String chdatatype;
+							if((chdatatype = ct.checktabledatatype(c.dataType)) == null){
+								ct.addTable(c.name,c.attribute, c.dataType,  c.primaryKey);
+								ct.printtb();
+							}else{
+								System.out.println(chdatatype + " is wrong datatype");
+							}
+							
 						}else{
-							System.out.println(chdatatype + " is wrong datatype");
+							System.out.println("已經存在此table");
 						}
-						
-					}else{
-						System.out.println("已經存在此table");
-					}
-//					System.out.println(c.name);
-//					System.out.println(c.primaryKey);
-//					System.out.println(c.dataType.toString());
-//					System.out.println(c.attribute.toString());
-					break;
-				case Insert:
-					Insert i = (Insert)parser.r;
-					break;
-				default:
-			}
-			
-			
-			
-			
-			
+//						System.out.println(c.name);
+//						System.out.println(c.primaryKey);
+//						System.out.println(c.dataType.toString());
+//						System.out.println(c.attribute.toString());
+						break;
+					case Insert:
+						Insert i = (Insert)parser.r;
+						break;
+					default:
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 
 			
 			

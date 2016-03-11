@@ -1,58 +1,57 @@
-import java.util.ArrayList;
-import java.util.List;
 
 public class Parser {
 	
 	public Parser(){
 	}
 	
-	public Parser(String input) {
+	public Parser(String input) throws Exception {
 		this.checkCommandSyntax(input);
 	}
 	
-	private void checkCommandSyntax(String input) {
+	private void checkCommandSyntax(String input) throws Exception {
 		/* WARN
-		 * Onlu suitable for Create Table and Insert command,
+		 * Only suitable for Create Table and Insert command,
 		 * because the manner of checking command is parsing input with (.
 		 */
 		
 		String[] tmp = input.split("\\(", 2);
+		if(tmp.length < 2)
+			throw new Exception("Syntax Error: open bracket (");
 		
 		String[] command = tmp[0].split(" ");
-		String[] value = tmp[1].substring(0, tmp[1].length()-2).split(",");
-		if(command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("table")) {
+		if(command.length < 3)
+			throw new Exception("Command Not Found.");
+		
+		if(command[0].equals("create") && command[1].equals("table")) {
+			if(command.length > 4)
+				throw new Exception("Command Not Found.");
+			// TODO: close bracket not check.
+			
 			this.command = Command.CreateTable;
+			String[] value = tmp[1].substring(0, tmp[1].length()-1).split(",");
+			
 			CreateTable ct = new CreateTable(this.command);
 			ct.setName(command[2]);
-			parseValue(ct, value);
-			r = ct;			
-		} else if(command[0].equalsIgnoreCase("insert") && command[1].equalsIgnoreCase("into")) {
+			ct.parseValue(value);
+			r = ct;
+		} else if(command[0].equals("insert") && command[1].equals("into")) {
+			if(command.length == 4 && !command[3].equals("values"))
+				throw new Exception("Command Not Found.");
 			this.command = Command.Insert;
-			Insert i = new Insert(this.command);
+			// TODO: close bracket not check.
 			
-
+			String[] col = tmp[1].split("\\)", 2)[0].split(",");
+			
+			
+			String s = tmp[1].split("\\(", 2)[1];
+			String[] value = s.substring(0, s.length()-1).split(",");
+			
+			Insert i = new Insert(this.command);
+			i.setName(command[2]);
+			i.parseValue(col, value);
+			r = i;
 		} else
 			this.command = Command.Error;
-		
-	}
-	
-	
-	private void parseValue(CreateTable ct, String[] in) {
-
-		String[] attribute = new String[in.length];
-		String[] dataType = new String[in.length];
-		int primaryKey = -1;
-		
-		for(int i = 0; i < in.length; i++) {
-			String[] tmp = in[i].trim().split(" ");
-			attribute[i] = tmp[0];
-			dataType[i] = tmp[1];
-			if(tmp.length > 2)
-				primaryKey = i;	
-		}
-		ct.attribute = attribute;
-		ct.dataType = dataType;
-		ct.primaryKey = primaryKey;
 		
 	}
 
@@ -60,8 +59,6 @@ public class Parser {
 	private Command command;
 	public SQLRequest r;
 
-	
 	public Command getCommand() { return command; }
-
 	
 }

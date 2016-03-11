@@ -1,85 +1,67 @@
-import gudusoft.gsqlparser.EDbVendor;
-import gudusoft.gsqlparser.TCustomSqlStatement;
-import gudusoft.gsqlparser.TGSqlParser;
-import gudusoft.gsqlparser.TSourceTokenList;
-import gudusoft.gsqlparser.stmt.TCreateTableSqlStatement;
-import gudusoft.gsqlparser.stmt.TInsertSqlStatement;
-import gudusoft.gsqlparser.stmt.TSelectSqlStatement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
 	
 	public Parser(){
 	}
 	
-	public void doParser(String command){
-		TGSqlParser sqlparser = new TGSqlParser(EDbVendor.dbvoracle);
-        sqlparser.sqltext = command;
-        int ret = sqlparser.parse();
-        if (ret == 0){
-              for(int i=0;i<sqlparser.sqlstatements.size();i++){
-                    analyzeStmt(sqlparser.sqlstatements.get(i));
-                    System.out.println("");
-              }
-        }else{
-              System.out.println(sqlparser.getErrormessage());
-        }
+	public Parser(String input) {
+		this.checkCommandSyntax(input);
 	}
-	public void analyzeStmt(TCustomSqlStatement stmt){
-		switch(stmt.sqlstatementtype){
-			case sstinsert:
-				analyzeInsertStmt((TInsertSqlStatement)stmt);
-				
-				
-				break;
-			case sstcreatetable:
-				analyzeCreateStmt((TCreateTableSqlStatement)stmt);
-				
-				
-				break;
-		
-//			
-//	        case sstselect: 
-//	        		analyzeSelectStmt((TSelectSqlStatement)stmt);
-//	        		break;
-//			case sstupdate:
-//			   break;
-//			case sstaltertable:
-//			   break;
-//			case sstcreateview:
-//			   break;
-//			
-			default:
-			   System.out.println(stmt.sqlstatementtype.toString());
-		}
-			
 	
+	private void checkCommandSyntax(String input) {
+		/* WARN
+		 * Onlu suitable for Create Table and Insert command,
+		 * because the manner of checking command is parsing input with (.
+		 */
+		
+		String[] tmp = input.split("\\(", 2);
+		
+		String[] command = tmp[0].split(" ");
+		String[] value = tmp[1].substring(0, tmp[1].length()-2).split(",");
+		if(command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("table")) {
+			this.command = Command.CreateTable;
+			CreateTable ct = new CreateTable(this.command);
+			ct.setName(command[2]);
+			parseValue(ct, value);
+			r = ct;			
+		} else if(command[0].equalsIgnoreCase("insert") && command[1].equalsIgnoreCase("into")) {
+			this.command = Command.Insert;
+			Insert i = new Insert(this.command);
+			
+
+		} else
+			this.command = Command.Error;
+		
+	}
+	
+	
+	private void parseValue(CreateTable ct, String[] in) {
+
+		String[] attribute = new String[in.length];
+		String[] dataType = new String[in.length];
+		int primaryKey = -1;
+		
+		for(int i = 0; i < in.length; i++) {
+			String[] tmp = in[i].trim().split(" ");
+			attribute[i] = tmp[0];
+			dataType[i] = tmp[1];
+			if(tmp.length > 2)
+				primaryKey = i;	
+		}
+		ct.attribute = attribute;
+		ct.dataType = dataType;
+		ct.primaryKey = primaryKey;
+		
 	}
 
 	
-	private void analyzeCreateStmt(TCreateTableSqlStatement stmt){
-		String tablename = stmt.getTableName().toString();
-		System.out.println("table name = " + tablename);
-		
-		// check table name 是否重複
-		if(Main.ct.checktablename(tablename)!=null){
-			
-		}
-		
-		for(int i=0;i<stmt.getColumnList().size();i++){
-			System.out.println(stmt.getColumnList().getElement(i));
-		}
-		
-		
-		
-	}
+	private Command command;
+	public SQLRequest r;
+
 	
-	private void analyzeInsertStmt(TInsertSqlStatement stmt){
-		
-	}
-	private void analyzeSelectStmt(TSelectSqlStatement stmt) {
-		// TODO Auto-generated method stub
-		
-	}
+	public Command getCommand() { return command; }
+
 	
-	 
 }

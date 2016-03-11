@@ -9,13 +9,30 @@ public class TableList {
 		String []datatype;
 		row rowlist;
 		int primary_key;
+		HashMap<String, Integer> varchar_map;
 		
 		
 		public table_node(String tablename, String[] colname, String[] datatype, int primary_key) {
 			// TODO Auto-generated constructor stub
 			this.tablename = tablename;
-			this.colname = colname;
-			this.datatype = datatype;
+			this.datatype = new String[datatype.length];
+			this.colname = new String[colname.length];
+			varchar_map = new HashMap<String, Integer>();
+			
+			for(int i=0;i<datatype.length;i++){
+				if(datatype[i].contains("_")){
+					String []tmp = datatype[i].split("_");
+					
+					this.datatype[i] = tmp[0];
+					this.colname[i] = colname[i];
+					
+					varchar_map.put(colname[i],Integer.parseInt(tmp[1]));
+				}else{
+					this.datatype[i] = datatype[i];
+					this.colname[i] = colname[i];
+				}
+			}
+			
 			next_table = null;
 			this.primary_key = primary_key;
 			rowlist = new row();
@@ -40,7 +57,8 @@ public class TableList {
 		public String []data;
 		public row_node(String[] input){
 			next_row = null;
-			data = input;
+			data = new String[data.length];
+			data = input.clone();
 		}
 	}
 	
@@ -86,10 +104,14 @@ public class TableList {
 		String re = "";
 		int ifwrongdatatype = 0;
 		for(String data : datatype){
-			
+			if(data.contains("_")){
+				data = data.split("_")[0];
+				System.out.println(data);
+			}
 			if(data.contains("int")&&data.length()==3||data.contains("varchar")&&data.length()==7){
 				continue;
 			}else{
+				System.out.println(data + " " + data.length());
 				ifwrongdatatype = 1;
 				re = re + data + " ";
 			}

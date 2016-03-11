@@ -3,19 +3,61 @@ import java.util.*;
 public class Main {
 	
 	public static TableList ct;
-	public static InsertTb it;
+	//public static InsertTb it;
 	
-	public static void main(String[] argc){
-		String input_command;
+	public static void main(String[] argc) {
 		
 		Scanner scanner = new Scanner(System.in);
-		Parser parser = new Parser();
+		Parser parser;
 		ct = new TableList();
-		it = new InsertTb();
+		//it = new InsertTb();
 		
 		while(true){
-			input_command = scanner.nextLine();
-			parser.doParser(input_command);
+			
+			String command = "";
+			String[] tmp;
+			do {
+				String input = scanner.nextLine();
+				if(input.indexOf(";") > 0) {
+					tmp = input.split(";");
+					command = command.concat(tmp[0]);
+					// remaining tmp[1]
+					break;
+				} else if(input.indexOf(";") == 0) {
+					// remaining tmp[1]
+					break;
+				} else {
+					command = command.concat(input);
+				}
+			} while(command.length() <= 1024);
+
+			parser = new Parser(command);
+			
+			// get command type in enum
+			switch(parser.r.getCommand()) {
+				case CreateTable:
+					CreateTable c = (CreateTable)parser.r;
+					System.out.println(c.name);
+					System.out.println(c.primaryKey);
+					System.out.println(c.dataType.toString());
+					System.out.println(c.attribute.toString());
+					break;
+				case Insert:
+					Insert i = (Insert)parser.r;
+					break;
+				default:
+			}
+			
+			
+			
+			
+			
+
+			
+			
+			/*
+			
+			//parser.doParser(input_command);
 			
 			String[] s1 = new String[3];
 			s1[0] = "a";
@@ -44,22 +86,7 @@ public class Main {
 			break;
 			
 			
-			parser  x
-			checkdatatype x
-			checktablename  o
-			create o
-			
-			parser
-			checkTablename o
-			checkdatatype x
-			checkprimarykey o
-			insert o
-			
-			
-			
-			
+			*/
 		}
 	}
-	
-	
 }

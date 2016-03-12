@@ -145,8 +145,8 @@ public class TableList {
 						continue;
 					}
 				}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
-					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
-						// -2 是去除單引號
+					if(now_table.varchar_map.get(colname[a]) < data[a].length()){
+						
 						return 2;
 					}else{
 						continue;

@@ -21,7 +21,9 @@ public class Insert extends SQLRequest{
 		for(int i = 0; i < c.length; i++) {
 			// TODO: 判斷''for string
 			c[i] = c[i].trim();
+			
 			v[i] = v[i].trim();
+			v[i] = v[i].replace("'", "");
 		}
 		this.colName = c;
 		this.colValue = v;

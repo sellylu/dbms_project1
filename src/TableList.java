@@ -56,9 +56,9 @@ public class TableList {
 		public row_node next_row;
 		public String []data;
 		public row_node(String[] input){
-			next_row = null;
-			data = new String[data.length];
-			data = input.clone();
+			this.next_row = null;
+			this.data = new String[input.length];
+			this.data = input.clone();
 		}
 	}
 	
@@ -164,10 +164,10 @@ public class TableList {
 		return now_table.primary_key;
 	}
 	
-	public boolean checkPrimaryKeyComflict(table_node now_table,int key,int index){
+	public boolean checkPrimaryKeyComflict(table_node now_table,String key,int index){
 		row_node a = now_table.rowlist.head_row;
 		while(a != null){
-			if(Integer.parseInt(a.data[index]) == key){
+			if(a.data[index].equals(key)){
 				return true;
 			}
 			a = a.next_row;

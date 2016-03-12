@@ -59,26 +59,33 @@ public class Main {
 						if(tn != null){
 							int primary_key_index = ct.returnPrimaryKeyIndex(tn);
 							
-							if(!i.colValue[primary_key_index].equals("null") && !i.colValue[primary_key_index].equals("") && !i.colValue[primary_key_index].equals("Null")){
-								switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
-									case 0:
-										
+							if(primary_key_index != -1){
+
+								if(!i.colValue[primary_key_index].equals("null") && !i.colValue[primary_key_index].equals("") && !i.colValue[primary_key_index].equals("Null")){
+									if(ct.checkPrimaryKeyComflict(tn, i.colValue[primary_key_index], primary_key_index)){
+										System.out.println("primary_key 重複了！");
 										break;
-									case 1:
-										System.out.println("Overflow!");
-										break;
-									case 2:
-										System.out.println("varchar size too long");
-										break;
-									case 3:
-										System.out.println("Datatype wrong");
-										break;
-									default:
-										System.out.println("Something wrong");
-										
+									}
+								}else{
+									System.out.println("primary_key 不能為空");
+									break;
 								}
-							}else{
-								System.out.println("primary_key 不能為空");
+							}
+							switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
+								case 0:
+									ct.insertRow(tn, i.colValue);
+									break;
+								case 1:
+									System.out.println("Overflow!");
+									break;
+								case 2:
+									System.out.println("varchar size too long");
+									break;
+								case 3:
+									System.out.println("Datatype wrong");
+									break;
+								default:
+									System.out.println("Something wrong");
 							}
 						}else{
 							System.out.println("不存在此table");

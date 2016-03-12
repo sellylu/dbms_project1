@@ -97,6 +97,8 @@ public class Main {
 						break;
 					default:
 				}
+				
+				ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

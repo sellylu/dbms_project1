@@ -87,7 +87,6 @@ public class TableList {
 	//  return false when hit
 	public table_node checktablename(String name){
 		table_node tmp = head_tb;
-		System.out.println("haha");
 		
 		while(tmp != null){
 			if(tmp.tablename.equals(name)){
@@ -106,12 +105,12 @@ public class TableList {
 		for(String data : datatype){
 			if(data.contains("_")){
 				data = data.split("_")[0];
-				System.out.println(data);
+				
 			}
 			if(data.contains("int")&&data.length()==3||data.contains("varchar")&&data.length()==7){
 				continue;
 			}else{
-				System.out.println(data + " " + data.length());
+				
 				ifwrongdatatype = 1;
 				re = re + data + " ";
 			}
@@ -138,22 +137,25 @@ public class TableList {
 		}
 		
 		for(int a=0;a<now_table.datatype.length ;a++){
-			if(datatype[a] == 1 && now_table.datatype[a].equals("int")){
-				if(Integer.parseInt(data[a]) > Integer.MAX_VALUE){
-					return 1;
-				}else{
-					continue;
+			if(!data[a].equals("")){ //表示此insert的col有值
+				if(datatype[a] == 1 && now_table.datatype[a].equals("int")){
+					if(Integer.parseInt(data[a]) > Integer.MAX_VALUE){
+						return 1;
+					}else{
+						continue;
+					}
+				}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
+					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
+						// -2 是去除單引號
+						return 2;
+					}else{
+						continue;
+					}
+				}else {
+					return 3;
 				}
-			}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
-				if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
-					// -2 是去除單引號
-					return 2;
-				}else{
-					continue;
-				}
-			}else {
-				return 3;
 			}
+			
 		}
 		return 0;
 	}
@@ -189,15 +191,22 @@ public class TableList {
 	}
 	
 	public void printtb(){
-		table_node keke = head_tb;
-		while(keke != null){
-			System.out.println("tablename = " + keke.tablename);
-			String []haha = keke.datatype;
-			String []lolo = keke.colname;
-			for(int i=0 ; i<haha.length;i++){
-				System.out.println("type&col " + haha[i] + " " + lolo[i]);
+		table_node tn = head_tb;
+		while(tn != null){
+			System.out.println(tn.tablename);
+			for(String a : tn.colname){
+				System.out.printf("%15s",a);
 			}
-			keke = keke.next_table;
+			System.out.println("");
+			row_node rn = tn.rowlist.head_row;
+			while(rn != null){
+				for(String a:rn.data){
+					System.out.printf("%15s",a);
+				}
+				System.out.println("");
+				rn = rn.next_row;
+			}
+			tn = tn.next_table;
 		}
 	}
 }

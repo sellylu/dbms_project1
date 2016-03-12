@@ -1,5 +1,6 @@
 import java.util.*;
 
+
 public class Main {
 	
 	public static TableList ct;
@@ -41,7 +42,7 @@ public class Main {
 							String chdatatype;
 							if((chdatatype = ct.checktabledatatype(c.dataType)) == null){
 								ct.addTable(c.name,c.attribute, c.dataType,  c.primaryKey);
-								ct.printtb();
+								
 							}else{
 								System.out.println(chdatatype + " is wrong datatype");
 							}
@@ -49,13 +50,31 @@ public class Main {
 						}else{
 							System.out.println("已經存在此table");
 						}
-//						System.out.println(c.name);
-//						System.out.println(c.primaryKey);
-//						System.out.println(c.dataType.toString());
-//						System.out.println(c.attribute.toString());
+						
 						break;
 					case Insert:
 						Insert i = (Insert)parser.r;
+						
+						TableList.table_node tn = ct.checktablename(i.name);
+						if(tn != null){
+							int primary_key_index = ct.returnPrimaryKeyIndex(tn);
+							
+							if(!i.colValue[primary_key_index].equals("null") && !i.colValue[primary_key_index].equals("") && !i.colValue[primary_key_index].equals("Null")){
+								if(ct.checkrowdatatype(tn, i.colValue)){
+									
+								}else{
+									System.out.println("Datatype wrong");
+								}
+							}else{
+								System.out.println("primary_key 不能為空");
+							}
+						}else{
+							System.out.println("不存在此table");
+						}
+						
+						// 判斷欄位值是否正確
+						// 判斷int varchar長度是否正確
+						// insert
 						break;
 					default:
 				}
@@ -66,38 +85,7 @@ public class Main {
 
 			
 			
-			/*
 			
-			//parser.doParser(input_command);
-			
-			String[] s1 = new String[3];
-			s1[0] = "a";
-			s1[1] = "b";
-			s1[2] = "c";
-			
-			String[] s2 = new String[3];
-			s2[0] = "d";
-			s2[1] = "e";
-			s2[2] = "f";
-			
-			ct.addTable("tablename", s1, s2,0);
-			
-			//ct.printtb();
-			String[] s3 = new String[3];
-			s3[0] = "q";
-			s3[1] = "w";
-			s3[2] = "e";
-			String[] s4 = new String[3];
-			s4[0] = "r";
-			s4[1] = "t";
-			s4[2] = "y";
-			ct.addTable("tablename2",s3,s4,1);
-			ct.printtb();
-			
-			break;
-			
-			
-			*/
 		}
 	}
 }

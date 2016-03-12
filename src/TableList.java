@@ -122,6 +122,32 @@ public class TableList {
 			return null;
 	}
 	
+	public boolean checkrowdatatype(table_node now_table, String[] data){
+		int [] datatype = new int [data.length];
+		int i=0;
+		for(String d : data){
+			System.out.println(d);
+			try{
+				int tmp = Integer.parseInt(d);
+				datatype[i] = 1;
+				i++;
+				System.out.println(tmp);
+			}catch(NumberFormatException e){
+				datatype[i] = 2;
+				i++;
+			}
+		}
+		
+		for(int a=0;a<now_table.datatype.length ;a++){
+			if((datatype[a] == 1 && now_table.datatype[a].equals("int")) || (datatype[a] == 2 && now_table.datatype[a].equals("varchar"))){
+				continue;
+			}else {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	
 	
 	public int returnPrimaryKeyIndex(table_node now_table){

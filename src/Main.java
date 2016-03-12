@@ -60,10 +60,22 @@ public class Main {
 							int primary_key_index = ct.returnPrimaryKeyIndex(tn);
 							
 							if(!i.colValue[primary_key_index].equals("null") && !i.colValue[primary_key_index].equals("") && !i.colValue[primary_key_index].equals("Null")){
-								if(ct.checkrowdatatype(tn, i.colValue)){
-									
-								}else{
-									System.out.println("Datatype wrong");
+								switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
+									case 0:
+										
+										break;
+									case 1:
+										System.out.println("Overflow!");
+										break;
+									case 2:
+										System.out.println("varchar size too long");
+										break;
+									case 3:
+										System.out.println("Datatype wrong");
+										break;
+									default:
+										System.out.println("Something wrong");
+										
 								}
 							}else{
 								System.out.println("primary_key 不能為空");

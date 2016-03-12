@@ -26,7 +26,7 @@ public class TableList {
 					this.datatype[i] = tmp[0];
 					this.colname[i] = colname[i];
 					
-					varchar_map.put(colname[i],Integer.parseInt(tmp[1]));
+					this.varchar_map.put(colname[i],Integer.parseInt(tmp[1]));
 				}else{
 					this.datatype[i] = datatype[i];
 					this.colname[i] = colname[i];
@@ -122,16 +122,15 @@ public class TableList {
 			return null;
 	}
 	
-	public boolean checkrowdatatype(table_node now_table, String[] data){
+	public int checkRowDatatypeAndLength(table_node now_table, String[] data,String []colname){
 		int [] datatype = new int [data.length];
+		
 		int i=0;
 		for(String d : data){
-			System.out.println(d);
 			try{
 				int tmp = Integer.parseInt(d);
 				datatype[i] = 1;
 				i++;
-				System.out.println(tmp);
 			}catch(NumberFormatException e){
 				datatype[i] = 2;
 				i++;
@@ -139,13 +138,24 @@ public class TableList {
 		}
 		
 		for(int a=0;a<now_table.datatype.length ;a++){
-			if((datatype[a] == 1 && now_table.datatype[a].equals("int")) || (datatype[a] == 2 && now_table.datatype[a].equals("varchar"))){
-				continue;
+			if(datatype[a] == 1 && now_table.datatype[a].equals("int")){
+				if(Integer.parseInt(data[a]) > Integer.MAX_VALUE){
+					return 1;
+				}else{
+					continue;
+				}
+			}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
+				if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
+					// -2 是去除單引號
+					return 2;
+				}else{
+					continue;
+				}
 			}else {
-				return false;
+				return 3;
 			}
 		}
-		return true;
+		return 0;
 	}
 	
 	

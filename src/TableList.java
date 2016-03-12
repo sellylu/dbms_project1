@@ -126,7 +126,12 @@ public class TableList {
 		
 		int i=0;
 		for(String d : data){
+			System.out.println(d);
 			try{
+				if(d == null){
+					datatype[i] = 3;
+					continue;
+				}
 				int tmp = Integer.parseInt(d);
 				datatype[i] = 1;
 				i++;
@@ -145,12 +150,14 @@ public class TableList {
 						continue;
 					}
 				}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
-					if(now_table.varchar_map.get(colname[a]) < data[a].length()){
+					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
 						
 						return 2;
 					}else{
 						continue;
 					}
+				}else if(datatype[a] == 3){
+					continue;
 				}else {
 					return 3;
 				}

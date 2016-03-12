@@ -61,7 +61,7 @@ public class Main {
 							
 							if(primary_key_index != -1){
 
-								if(!i.colValue[primary_key_index].equals("null") && !i.colValue[primary_key_index].equals("") && !i.colValue[primary_key_index].equals("Null")){
+								if(!i.colValue[primary_key_index].equals("null")){
 									if(ct.checkPrimaryKeyComflict(tn, i.colValue[primary_key_index], primary_key_index)){
 										System.out.println("primary_key 重複了！");
 										break;
@@ -90,10 +90,8 @@ public class Main {
 						}else{
 							System.out.println("不存在此table");
 						}
+					
 						
-						// 判斷欄位值是否正確
-						// 判斷int varchar長度是否正確
-						// insert
 						break;
 					default:
 				}

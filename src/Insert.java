@@ -1,3 +1,4 @@
+import java.awt.Window.Type;
 
 public class Insert extends SQLRequest{
 
@@ -19,9 +20,8 @@ public class Insert extends SQLRequest{
 
 		for(int i = 0; i < c.length; i++) {
 			// TODO: 判斷''for string
-			
-			c[i].trim();
-			v[i].trim();
+			c[i] = c[i].trim();
+			v[i] = v[i].trim();
 		}
 		this.colName = c;
 		this.colValue = v;

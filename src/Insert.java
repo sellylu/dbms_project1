@@ -1,7 +1,7 @@
 import java.awt.Window.Type;
 
 public class Insert extends SQLRequest{
-
+	
 	public Insert(Command c) {
 		super(c);
 		// TODO Auto-generated constructor stub
@@ -12,6 +12,7 @@ public class Insert extends SQLRequest{
 		this.name = n;
 		this.colName = col;
 		this.colValue = v;
+		
 	}
 	
 	public void parseValue(String[] c, String[] v) throws Exception {

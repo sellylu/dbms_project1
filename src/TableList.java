@@ -126,7 +126,7 @@ public class TableList {
 		
 		int i=0;
 		for(String d : data){
-			System.out.println(d);
+			
 			try{
 				if(d == null){
 					datatype[i] = 3;
@@ -214,6 +214,15 @@ public class TableList {
 				rn = rn.next_row;
 			}
 			tn = tn.next_table;
+		}
+	}
+	
+	public String[] getColName(String name){
+		table_node tn;
+		if((tn = this.checktablename(name))!=null){
+			return tn.colname;
+		}else{
+			return null;
 		}
 	}
 }

@@ -19,6 +19,7 @@ public class Main {
 			String[] tmp;
 			do {
 				String input = scanner.nextLine().toLowerCase();
+				
 				if(input.indexOf(";") > 0) {
 					tmp = input.split(";");
 					command = command.concat(tmp[0]);
@@ -31,7 +32,9 @@ public class Main {
 					command = command.concat(input);
 				}
 			} while(command.length() <= 1024);
-
+			
+			
+			
 			try {
 				parser = new Parser(command);
 				// get command type in enum
@@ -54,7 +57,10 @@ public class Main {
 						break;
 					case Insert:
 						Insert i = (Insert)parser.r;
-						
+//						for(String a:ct.getColName(i.name)){
+//							System.out.println(a);
+//						}
+//						
 						TableList.table_node tn = ct.checktablename(i.name);
 						if(tn != null){
 							int primary_key_index = ct.returnPrimaryKeyIndex(tn);
@@ -101,10 +107,7 @@ public class Main {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
-
-			
-			
-			
+	
 		}
 	}
 }

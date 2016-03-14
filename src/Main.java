@@ -51,7 +51,8 @@ public class Main {
 							}
 							
 						}else{
-							System.out.println("已經存在此table");
+							throw new Exception("Table " + c.name + "has been existed.");
+							//System.out.println("已經存在此table");
 						}
 						
 						break;
@@ -93,8 +94,9 @@ public class Main {
 								default:
 									System.out.println("Something wrong");
 							}
-						}else{
-							System.out.println("不存在此table");
+						} else {
+							throw new Exception("Table " + i.name + "doesn't exist.");
+							//System.out.println("不存在此table");
 						}
 					
 						
@@ -105,7 +107,8 @@ public class Main {
 				ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("[Error]  " + e.getMessage());
+				//e.printStackTrace();
 			}	
 	
 		}

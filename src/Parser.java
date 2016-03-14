@@ -38,7 +38,10 @@ public class Parser {
 				throw new Exception("Command Not Found.");
 			else if(command.length == 4 && command[3].equals("values")) {	// INSERT INTO VALUES ();
 				value = tmp[1].substring(0, tmp[1].length()-1).split(",");
-				col = Main.ct.getColName(command[2]);
+				if(Main.ct.getColName(command[2]) == null)
+					throw new Exception("Table doesn't exist");
+				else
+					col = Main.ct.getColName(command[2]);
 			} else {	// INSERT INTO table () VALUES ();
 				col = tmp[1].split("\\)", 2)[0].split(",");
 				String s = tmp[1].split("\\(", 2)[1];

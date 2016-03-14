@@ -19,7 +19,10 @@ public class Insert extends SQLRequest{
 		if(c.length != v.length)
 			throw new Exception("Syntax Error: column and value not fit");
 		
-		this.colName = Main.ct.getColName(this.name);
+		if(Main.ct.getColName(this.name) == null)
+			throw new Exception("Table doesn't exist");
+		else
+			this.colName = Main.ct.getColName(this.name);
 		this.colValue = new String[this.colName.length];
 		for(int i = 0; i < this.colName.length; i++) {
 			for(int j = 0; j < c.length; j++) {

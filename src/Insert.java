@@ -18,10 +18,25 @@ public class Insert extends SQLRequest{
 	public void parseValue(String[] c, String[] v) throws Exception {
 		if(c.length != v.length)
 			throw new Exception("Syntax Error: column and value not fit");
-
+		
+		this.colName = Main.ct.getColName(this.name);
+		this.colValue = new String[this.colName.length];
+		for(int i = 0; i < this.colName.length; i++) {
+			for(int j = 0; j < c.length; j++) {
+				if(this.colName[i].equals(c[j].trim())) {
+					this.colName[i] = c[j].trim();
+					this.colValue[i] = v[j].trim();
+					break;
+				} else {
+					this.colValue[i] = "null";
+				}
+			}
+		}
+/*
 		for(int i = 0; i < c.length; i++) {
 			// TODO: 判斷''for string
-			c[i] = c[i].trim();
+			if(!c[i].isEmpty())
+				c[i] = c[i].trim();
 			v[i] = v[i].trim();
 			if(v[i].length() == 0){
 				System.out.println(v[i]);
@@ -29,8 +44,9 @@ public class Insert extends SQLRequest{
 			}
 			//v[i] = v[i].replace("'", "");
 		}
-		this.colName = c;
-		this.colValue = v;
+		*/
+		//this.colName = c;
+		//this.colValue = v;
 	}
 	
 	public void setName(String n) { this.name = n; }

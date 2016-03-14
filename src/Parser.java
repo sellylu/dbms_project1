@@ -26,31 +26,34 @@ public class Parser {
 				throw new Exception("Command Not Found.");
 			// TODO: close bracket not check.
 			
-			this.command = Command.CreateTable;
 			String[] value = tmp[1].substring(0, tmp[1].length()-1).split(",");
 			
-			CreateTable ct = new CreateTable(this.command);
+			CreateTable ct = new CreateTable(Command.CreateTable);
 			ct.setName(command[2]);
 			ct.parseValue(value);
 			r = ct;
 		} else if(command[0].equals("insert") && command[1].equals("into")) {
+			String[] value,col;
 			if(command.length == 4 && !command[3].equals("values"))
 				throw new Exception("Command Not Found.");
-			this.command = Command.Insert;
+			else if(command.length == 4 && command[3].equals("values")) {	// INSERT INTO VALUES ();
+				value = tmp[1].substring(0, tmp[1].length()-1).split(",");
+				col = Main.ct.getColName(command[2]);
+			} else {	// INSERT INTO table () VALUES ();
+				col = tmp[1].split("\\)", 2)[0].split(",");
+				String s = tmp[1].split("\\(", 2)[1];
+				value = s.substring(0, s.length()-1).split(",");
+			}
 			// TODO: close bracket not check.
 			
-			String[] col = tmp[1].split("\\)", 2)[0].split(",");
-			
-			
-			String s = tmp[1].split("\\(", 2)[1];
-			String[] value = s.substring(0, s.length()-1).split(",");
-			
-			Insert i = new Insert(this.command);
+			Insert i = new Insert(Command.Insert);
 			i.setName(command[2]);
 			i.parseValue(col, value);
 			r = i;
-		} else
+		} else {
 			this.command = Command.Error;
+			throw new Exception("Command Not Found.");
+		}
 		
 	}
 

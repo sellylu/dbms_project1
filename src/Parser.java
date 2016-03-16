@@ -34,7 +34,7 @@ public class Parser {
 			r = ct;
 		} else if(command[0].equals("insert") && command[1].equals("into")) {
 			String[] value,col;
-			if((command.length == 4 && !command[3].equals("values")) || command.length < 4)
+			if(command.length == 4 && !command[3].equals("values"))
 				throw new Exception("Command Not Found.");
 			else if(command.length == 4 && command[3].equals("values")) {	// INSERT INTO VALUES ();
 				value = tmp[1].substring(0, tmp[1].length()-1).split(",");

@@ -150,7 +150,7 @@ public class TableList {
 						continue;
 					}
 				}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
-					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
+					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2 && !data[a].equals("null")){
 						
 						return 2;
 					}else{

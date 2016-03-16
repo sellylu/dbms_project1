@@ -13,23 +13,47 @@ public class Main {
 		ct = new TableList();
 		//it = new InsertTb();
 		
+		String command;
+		String[] tmp;
+		String remain = "";
 		while(true){
+			command = "";
+			/*
+			if(!remain.isEmpty()) {
+				command = command.concat(remain);
+				remain = "";
+			}*/
 			
-			String command = "";
-			String[] tmp;
 			do {
+				/*
+				if(command.indexOf(";") > 0) {
+					tmp = command.split(";", 2);
+					command = command.concat(tmp[0]);
+					remain = tmp[1];
+				}*/
+					
+				
 				String input = scanner.nextLine().toLowerCase();
 				
 				if(input.indexOf(";") > 0) {
-					tmp = input.split(";");
-					command = command.concat(tmp[0]);
+					tmp = input.split(";", 2);
+					if(!command.isEmpty())
+						command = command.concat(" " + tmp[0]);
+					else
+						command = command.concat(tmp[0]);
+					remain = tmp[1];
 					// remaining tmp[1]
 					break;
 				} else if(input.indexOf(";") == 0) {
+					tmp = input.split(";", 2);
+					remain = tmp[1];
 					// remaining tmp[1]
 					break;
 				} else {
-					command = command.concat(input);
+					if(!command.isEmpty())
+						command = command.concat(" " + input);
+					else
+						command = command.concat(input);
 				}
 			} while(command.length() <= 1024);
 			
@@ -70,12 +94,10 @@ public class Main {
 
 								if(!i.colValue[primary_key_index].equals("null")){
 									if(ct.checkPrimaryKeyComflict(tn, i.colValue[primary_key_index], primary_key_index)){
-										System.out.println("primary_key 重複了！");
-										break;
+										throw new Exception("duplicated primary key.");
 									}
 								}else{
-									System.out.println("primary_key 不能為空");
-									break;
+									throw new Exception("primary key cannot be null.");
 								}
 							}
 							switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){

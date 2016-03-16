@@ -24,7 +24,7 @@ public class CreateTable extends SQLRequest{
 			String[] tmp = in[i].trim().split(" ");
 			attribute[i] = tmp[0];
 			
-			if(tmp.length > 2 && tmp[2].equals("primary") && tmp[3].equals("key"))
+			if(tmp.length > 2 && tmp[2].equalsIgnoreCase("primary") && tmp[3].equalsIgnoreCase("key"))
 				primaryKey = i;	
 			else if(tmp.length > 2)
 				throw new Exception("Syntax Error: comma");

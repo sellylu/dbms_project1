@@ -33,7 +33,7 @@ public class Main {
 				}*/
 					
 				
-				String input = scanner.nextLine().toLowerCase();
+				String input = scanner.nextLine();
 				
 				if(input.indexOf(";") > 0) {
 					tmp = input.split(";", 2);
@@ -75,7 +75,8 @@ public class Main {
 							}
 							
 						}else{
-							throw new Exception("Table " + c.name + "has been existed.");
+							System.out.println("[Error]  Table " + c.name + " exists.");
+							break;
 							//System.out.println("已經存在此table");
 						}
 						
@@ -94,10 +95,12 @@ public class Main {
 
 								if(!i.colValue[primary_key_index].equals("null")){
 									if(ct.checkPrimaryKeyComflict(tn, i.colValue[primary_key_index], primary_key_index)){
-										throw new Exception("duplicated primary key.");
+										System.out.println("[Error]  Duplicated primary key.");
+										break;
 									}
 								}else{
-									throw new Exception("primary key cannot be null.");
+									System.out.println("[Error]  Primary key cannot be null.");
+									break;
 								}
 							}
 							switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
@@ -105,19 +108,19 @@ public class Main {
 									ct.insertRow(tn, i.colValue);
 									break;
 								case 1:
-									System.out.println("Overflow!");
+									System.out.println("[Error]  Overflow!");
 									break;
 								case 2:
-									System.out.println("varchar size too long");
+									System.out.println("[Error]  varchar size too long");
 									break;
 								case 3:
-									System.out.println("Datatype wrong");
+									System.out.println("[Error]  Datatype wrong");
 									break;
 								default:
-									System.out.println("Something wrong");
+									System.out.println("[Error]  Something wrong");
 							}
 						} else {
-							throw new Exception("Table " + i.name + "doesn't exist.");
+							System.out.println("Table " + i.name + "doesn't exist.");
 							//System.out.println("不存在此table");
 						}
 					

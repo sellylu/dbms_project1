@@ -89,7 +89,7 @@ public class TableList {
 		table_node tmp = head_tb;
 		
 		while(tmp != null){
-			if(tmp.tablename.equals(name)){
+			if(tmp.tablename.equalsIgnoreCase(name)){
 				return tmp;
 			}
 			tmp = tmp.next_table;
@@ -128,8 +128,9 @@ public class TableList {
 		for(String d : data){
 			
 			try{
-				if(d == null){
+				if(d.equals("null")){
 					datatype[i] = 3;
+					i++;
 					continue;
 				}
 				int tmp = Integer.parseInt(d);
@@ -150,7 +151,7 @@ public class TableList {
 						continue;
 					}
 				}else if(datatype[a] == 2 && now_table.datatype[a].equals("varchar")){
-					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2 && !data[a].equals("null")){
+					if(now_table.varchar_map.get(colname[a]) < data[a].length()-2){
 						
 						return 2;
 					}else{

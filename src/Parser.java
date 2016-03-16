@@ -21,7 +21,7 @@ public class Parser {
 		if(command.length < 3)
 			throw new Exception("Command Not Found.");
 		
-		if(command[0].equals("create") && command[1].equals("table")) {
+		if(command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("table")) {
 			if(command.length > 4)
 				throw new Exception("Command Not Found.");
 			// TODO: close bracket not check.
@@ -32,11 +32,11 @@ public class Parser {
 			ct.setName(command[2]);
 			ct.parseValue(value);
 			r = ct;
-		} else if(command[0].equals("insert") && command[1].equals("into")) {
+		} else if(command[0].equalsIgnoreCase("insert") && command[1].equalsIgnoreCase("into")) {
 			String[] value,col;
-			if(command.length == 4 && !command[3].equals("values"))
+			if(command.length == 4 && !command[3].equalsIgnoreCase("values"))
 				throw new Exception("Command Not Found.");
-			else if(command.length == 4 && command[3].equals("values")) {	// INSERT INTO VALUES ();
+			else if(command.length == 4 && command[3].equalsIgnoreCase("values")) {	// INSERT INTO VALUES ();
 				value = tmp[1].substring(0, tmp[1].length()-1).split(",");
 				if(Main.ct.getColName(command[2]) == null)
 					throw new Exception("Table doesn't exist");

@@ -32,17 +32,23 @@ public class CreateTable extends SQLRequest{
 			/* WARN
 			 * Suposse there are only two datatype.
 			 */
-			if(!tmp[1].equals("int")) {
-				if(tmp[1].substring(tmp[1].length()-1).equals(")") && tmp[1].substring(7,8).equals("(")) {
-					dataType[i] = tmp[1].replace("(", "_").substring(0, tmp[1].length()-1);
+			if (tmp[1].equals("int")){
+				dataType[i] = tmp[1];
+			} else if (tmp[1].length() >= 7) {
+				if(tmp[1].substring(0,7).equals("varchar")) {
+					if(tmp[1].substring(tmp[1].length()-1).equals(")") && tmp[1].substring(7,8).equals("(")) {
+						dataType[i] = tmp[1].replace("(", "_").substring(0, tmp[1].length()-1);
+					} else {
+						throw new Exception("Syntax Error: varchar()");
+					}
 				} else {
-					throw new Exception("Syntax Error: varchar()");
+					throw new Exception("Undefined datatype \"" + tmp[1] + "\"");
 				}
 			} else {
-				dataType[i] = tmp[1];
+				throw new Exception("Undefined datatype \"" + tmp[1] + "\"");
 			}
 
-		}		
+		}	
 	}
 	
 	public void setName(String n) { this.name = n; }

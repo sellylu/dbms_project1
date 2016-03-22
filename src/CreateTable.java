@@ -29,9 +29,6 @@ public class CreateTable extends SQLRequest{
 			else if(tmp.length > 2)
 				throw new Exception("Syntax Error: comma");
 			
-			/* WARN
-			 * Suposse there are only two datatype.
-			 */
 			if (tmp[1].equals("int")){
 				dataType[i] = tmp[1];
 			} else if (tmp[1].length() >= 7) {

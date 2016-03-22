@@ -10,7 +10,7 @@ public class Parser {
 	private void checkCommandSyntax(String input) throws Exception {
 		/* WARN
 		 * Only suitable for Create Table and Insert command,
-		 * because the manner of checking command is parsing input with (.
+		 * because first step of checking command is parsing input with (.
 		 */
 		
 		String[] tmp = input.split("\\(", 2);
@@ -54,16 +54,12 @@ public class Parser {
 			i.parseValue(col, value);
 			r = i;
 		} else {
-			this.command = Command.Error;
+			r = new SQLRequest(Command.Error);
 			throw new Exception("Command Not Found.");
 		}
 		
 	}
 
-	
-	private Command command;
 	public SQLRequest r;
-
-	public Command getCommand() { return command; }
 	
 }

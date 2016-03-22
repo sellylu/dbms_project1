@@ -15,24 +15,10 @@ public class Main {
 		
 		String command;
 		String[] tmp;
-		String remain = "";
 		while(true){
 			command = "";
-			/*
-			if(!remain.isEmpty()) {
-				command = command.concat(remain);
-				remain = "";
-			}*/
-			
+
 			do {
-				/*
-				if(command.indexOf(";") > 0) {
-					tmp = command.split(";", 2);
-					command = command.concat(tmp[0]);
-					remain = tmp[1];
-				}*/
-					
-				
 				String input = scanner.nextLine();
 				
 				if(input.indexOf(";") > 0) {
@@ -41,12 +27,10 @@ public class Main {
 						command = command.concat(" " + tmp[0]);
 					else
 						command = command.concat(tmp[0]);
-					remain = tmp[1];
 					// remaining tmp[1]
 					break;
 				} else if(input.indexOf(";") == 0) {
 					tmp = input.split(";", 2);
-					remain = tmp[1];
 					// remaining tmp[1]
 					break;
 				} else {
@@ -77,7 +61,6 @@ public class Main {
 						}else{
 							System.out.println("[Error]  Table " + c.name + " exists.");
 							break;
-							//System.out.println("已經存在此table");
 						}
 						
 						break;
@@ -120,8 +103,7 @@ public class Main {
 									System.out.println("[Error]  Something wrong");
 							}
 						} else {
-							System.out.println("Table " + i.name + "doesn't exist.");
-							//System.out.println("不存在此table");
+							System.out.println("Table " + i.name + " doesn't exist.");
 						}
 					
 						

@@ -1,4 +1,3 @@
-import java.awt.Window.Type;
 
 public class Insert extends SQLRequest{
 	
@@ -35,21 +34,6 @@ public class Insert extends SQLRequest{
 				}
 			}
 		}
-/*
-		for(int i = 0; i < c.length; i++) {
-			// TODO: 判斷''for string
-			if(!c[i].isEmpty())
-				c[i] = c[i].trim();
-			v[i] = v[i].trim();
-			if(v[i].length() == 0){
-				System.out.println(v[i]);
-				v[i] = "null";
-			}
-			//v[i] = v[i].replace("'", "");
-		}
-		*/
-		//this.colName = c;
-		//this.colValue = v;
 	}
 	
 	public void setName(String n) { this.name = n; }

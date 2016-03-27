@@ -1,8 +1,9 @@
 
 public class CreateTable extends SQLRequest{
 	
-	public CreateTable(Command c) {
+	public CreateTable(Command c, String n) {
 		super(c);
+		this.name = n;
 	}
 
 	public CreateTable(Command c, String n, String[] d, String[] a, int p) {
@@ -14,7 +15,7 @@ public class CreateTable extends SQLRequest{
 		this.primaryKey = p;
 	}
 	
-	public void parseValue(String[] in) throws Exception {
+	void parseValue(String[] in) throws Exception {
 
 		this.attribute = new String[in.length];
 		this.dataType = new String[in.length];
@@ -47,9 +48,7 @@ public class CreateTable extends SQLRequest{
 
 		}	
 	}
-	
-	public void setName(String n) { this.name = n; }
-	
+		
 	public String name;
 	public String[] dataType;
 	public String[] attribute;

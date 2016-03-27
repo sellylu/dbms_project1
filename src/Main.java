@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -6,6 +11,30 @@ public class Main {
 	public static TableList ct;
 	//public static InsertTb it;
 	
+	public static String[] getFileContent(String fileName){
+		
+		FileReader file;
+		BufferedReader br;
+		String line;
+		String filecontent = new String();
+		try {
+			file = new FileReader(fileName);
+		    br=new BufferedReader(file);
+			while ((line=br.readLine()) != null) {
+				filecontent = filecontent + line;
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.printf("File no exist");
+		} catch (IOException e){
+		}
+		
+		int n = filecontent.codePointCount(0, filecontent.length());
+		String []output = new String[n];
+		output = filecontent.split(";");
+		
+		return output;
+	}
 	public static void main(String[] argc) {
 		
 		Scanner scanner = new Scanner(System.in);

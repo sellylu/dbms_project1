@@ -1,4 +1,3 @@
-import java.awt.Window.Type;
 
 public class Insert extends SQLRequest{
 	
@@ -18,19 +17,23 @@ public class Insert extends SQLRequest{
 	public void parseValue(String[] c, String[] v) throws Exception {
 		if(c.length != v.length)
 			throw new Exception("Syntax Error: column and value not fit");
-
-		for(int i = 0; i < c.length; i++) {
-			// TODO: 判斷''for string
-			c[i] = c[i].trim();
-			v[i] = v[i].trim();
-			if(v[i].length() == 0){
-				System.out.println(v[i]);
-				v[i] = "null";
+		
+		if(Main.ct.getColName(this.name) == null)
+			throw new Exception("Table doesn't exist");
+		else
+			this.colName = Main.ct.getColName(this.name);
+		this.colValue = new String[this.colName.length];
+		for(int i = 0; i < this.colName.length; i++) {
+			for(int j = 0; j < c.length; j++) {
+				if(this.colName[i].equals(c[j].trim())) {
+					this.colName[i] = c[j].trim();
+					this.colValue[i] = v[j].trim();
+					break;
+				} else {
+					this.colValue[i] = "null";
+				}
 			}
-			//v[i] = v[i].replace("'", "");
 		}
-		this.colName = c;
-		this.colValue = v;
 	}
 	
 	public void setName(String n) { this.name = n; }

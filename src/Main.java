@@ -13,23 +13,31 @@ public class Main {
 		ct = new TableList();
 		//it = new InsertTb();
 		
+		String command;
+		String[] tmp;
 		while(true){
-			
-			String command = "";
-			String[] tmp;
+			command = "";
+
 			do {
-				String input = scanner.nextLine().toLowerCase();
+				String input = scanner.nextLine();
 				
 				if(input.indexOf(";") > 0) {
-					tmp = input.split(";");
-					command = command.concat(tmp[0]);
+					tmp = input.split(";", 2);
+					if(!command.isEmpty())
+						command = command.concat(" " + tmp[0]);
+					else
+						command = command.concat(tmp[0]);
 					// remaining tmp[1]
 					break;
 				} else if(input.indexOf(";") == 0) {
+					tmp = input.split(";", 2);
 					// remaining tmp[1]
 					break;
 				} else {
-					command = command.concat(input);
+					if(!command.isEmpty())
+						command = command.concat(" " + input);
+					else
+						command = command.concat(input);
 				}
 			} while(command.length() <= 1024);
 			
@@ -51,7 +59,8 @@ public class Main {
 							}
 							
 						}else{
-							System.out.println("已經存在此table");
+							System.out.println("[Error]  Table " + c.name + " exists.");
+							break;
 						}
 						
 						break;
@@ -69,11 +78,11 @@ public class Main {
 
 								if(!i.colValue[primary_key_index].equals("null")){
 									if(ct.checkPrimaryKeyComflict(tn, i.colValue[primary_key_index], primary_key_index)){
-										System.out.println("primary_key 重複了！");
+										System.out.println("[Error]  Duplicated primary key.");
 										break;
 									}
 								}else{
-									System.out.println("primary_key 不能為空");
+									System.out.println("[Error]  Primary key cannot be null.");
 									break;
 								}
 							}
@@ -82,19 +91,19 @@ public class Main {
 									ct.insertRow(tn, i.colValue);
 									break;
 								case 1:
-									System.out.println("Overflow!");
+									System.out.println("[Error]  Overflow!");
 									break;
 								case 2:
-									System.out.println("varchar size too long");
+									System.out.println("[Error]  varchar size too long");
 									break;
 								case 3:
-									System.out.println("Datatype wrong");
+									System.out.println("[Error]  Datatype wrong");
 									break;
 								default:
-									System.out.println("Something wrong");
+									System.out.println("[Error]  Something wrong");
 							}
-						}else{
-							System.out.println("不存在此table");
+						} else {
+							System.out.println("Table " + i.name + " doesn't exist.");
 						}
 					
 						
@@ -105,7 +114,8 @@ public class Main {
 				ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.out.println("[Error]  " + e.getMessage());
+				//e.printStackTrace();
 			}	
 	
 		}

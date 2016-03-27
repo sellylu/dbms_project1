@@ -1,9 +1,9 @@
 
 public class Insert extends SQLRequest{
 	
-	public Insert(Command c) {
+	public Insert(Command c, String n) {
 		super(c);
-		// TODO Auto-generated constructor stub
+		this.name = n;
 	}
 	
 	public Insert(Command c, String n, String[] col, String[] v) {
@@ -14,7 +14,7 @@ public class Insert extends SQLRequest{
 		
 	}
 	
-	public void parseValue(String[] c, String[] v) throws Exception {
+	void parseValue(String[] c, String[] v) throws Exception {
 		if(c.length != v.length)
 			throw new Exception("Syntax Error: column and value not fit");
 		
@@ -36,8 +36,6 @@ public class Insert extends SQLRequest{
 		}
 	}
 	
-	public void setName(String n) { this.name = n; }
-
 	public String name;
 	public String[] colName;
 	public String[] colValue;

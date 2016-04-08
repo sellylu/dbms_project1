@@ -52,15 +52,14 @@ public class Parser {
 			Insert i = new Insert(Command.Insert, command[2]);
 			i.parseValue(col, value);
 			r = i;
-		} else if(command[0].equalsIgnoreCase("select") && input.indexOf("from") != -1) {
-			
-			Select s = new Select(Command.Select, command[2]);
-			s.parseValue();
+		} else if(command[0].equalsIgnoreCase("select") && input.toLowerCase().indexOf("from") != -1) {
+			Select s = new Select(Command.Select);
+			s.parseValue(input);
 			r = s;
 		} else if(command[0].equalsIgnoreCase("import")) {
 			
-			Import i = new Import(Command.Import, command[1]);
-			r = i;
+			ImportFile im = new ImportFile(Command.Import, command[1]);
+			r = im;
 		} else {
 			r = new SQLRequest(Command.Error);
 			throw new Exception("Command Not Found.");

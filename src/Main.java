@@ -137,6 +137,11 @@ public class Main {
 					
 						
 						break;
+					case Select:
+						Select s = (Select)parser.r;
+						
+						
+						break;
 					default:
 				}
 				

@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.List;
  
 public class TableList {
 	class table_node{
@@ -225,5 +226,56 @@ public class TableList {
 		}else{
 			return null;
 		}
+	}
+	
+	public boolean ifExistCol(String tablename,String colname){
+		String [] colnames = getColName(tablename);
+		for(String tmp : colnames){
+			if(tmp.equals(colname)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkColInTable(String[] input_table_name,List input_colname){
+		
+		// 判斷是否都存在其table
+		
+		for(Object a : input_colname){
+			
+			//假如沒有宣告tablename
+			// 判斷有沒有comflict
+			String tablename = a.getTableName();
+			String colname = a.getColName();
+			
+			
+			if(colname.equals("*")) continue;
+			
+			
+			if(tablename.equals("empty")){
+				int count = 0;
+				for(String tmp_input_table_name : input_table_name){
+					if(ifExistCol(tmp_input_table_name,colname) == true){
+						count++;
+					}
+					if(count ==2){
+						System.out.println("comflict了～～～");
+					}
+				}
+				
+			}
+			
+			// 拿到a_node 的 col   
+			else{
+				if(!ifExistCol(tablename,colname)){
+					System.out.println("沒這col name");
+				};
+			}
+			
+			
+		}
+		return true;
+		
 	}
 }

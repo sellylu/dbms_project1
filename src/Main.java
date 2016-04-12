@@ -140,7 +140,7 @@ public class Main {
 						break;
 					case Select:
 						Select s = (Select)parser.r;
-						
+						ct.checkColInTable(s.tableName,s.colName);
 						
 						break;
 					case ImportFile:

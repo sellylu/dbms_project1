@@ -238,29 +238,30 @@ public class TableList {
 		return false;
 	}
 	
-	public boolean checkColInTable(String[] input_table_name,List input_colname){
+	public boolean checkColInTable(String[] input_table_name,List<List<String>> input_colname){
 		
 		// 判斷是否都存在其table
 		
-		for(Object a : input_colname){
+		for(List<String> a : input_colname){
 			
-			//假如沒有宣告tablename
-			// 判斷有沒有comflict
-			String tablename = a.getTableName();
-			String colname = a.getColName();
+			// 假如沒有宣告tablename
+			// 判斷有沒有conflict
+			// a => {tableName, colName} 
+			String tablename = a.get(0);
+			String colname = a.get(1);
 			
 			
 			if(colname.equals("*")) continue;
 			
 			
-			if(tablename.equals("empty")){
+			if(tablename == null){
 				int count = 0;
 				for(String tmp_input_table_name : input_table_name){
 					if(ifExistCol(tmp_input_table_name,colname) == true){
 						count++;
 					}
 					if(count ==2){
-						System.out.println("comflict了～～～");
+						System.out.println("conflict了～～～");
 					}
 				}
 				

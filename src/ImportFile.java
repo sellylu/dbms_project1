@@ -6,6 +6,6 @@ public class ImportFile extends SQLRequest{
 		this.name = n;
 	}
 
-	private String name;
+	String name;
 
 }

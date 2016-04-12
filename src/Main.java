@@ -11,7 +11,7 @@ public class Main {
 	public static TableList ct;
 	//public static InsertTb it;
 	
-	public static String[] getFileContent(String fileName){
+	public static String[] getFileContent(String fileName) {
 		
 		FileReader file;
 		BufferedReader br;
@@ -35,6 +35,7 @@ public class Main {
 		
 		return output;
 	}
+	
 	public static void main(String[] argc) {
 		
 		Scanner scanner = new Scanner(System.in);
@@ -141,6 +142,10 @@ public class Main {
 						Select s = (Select)parser.r;
 						ct.checkColInTable(s.tableName,s.colName);
 						
+						break;
+					case ImportFile:
+						ImportFile im = (ImportFile)parser.r;
+						Main.getFileContent(im.name);
 						break;
 					default:
 				}

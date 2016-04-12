@@ -3,6 +3,6 @@ public enum Command {
 	CreateTable,
 	Insert,
 	Select,
-	Import,
+	ImportFile,
 	Error
 }

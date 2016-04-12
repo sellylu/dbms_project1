@@ -15,26 +15,24 @@ public class Parser {
 		
 		String[] command = input.split(" ", 5);
 		
-		if(command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("table")) {
+		if (command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("table")) {
 			String[] tmp = input.split("\\(", 2);
-			if(tmp.length < 2)
-				throw new Exception("Syntax Error: open bracket (");
-			if(command.length > 4)
+			if(tmp.length < 2 || !tmp[1].contains(")"))
+				throw new Exception("Syntax Error: bracket ()");
+			if(tmp[0].split(" ").length > 4)
 				throw new Exception("Command Not Found.");
-			// TODO: close bracket not check.
 			
 			value = tmp[1].substring(0, tmp[1].length()-1).split(",");
 				
-			CreateTable ct = new CreateTable(Command.CreateTable, command[2]);
+			CreateTable ct = new CreateTable(Command.CreateTable, tmp[0].split(" ")[2]);
 			ct.parseValue(value);
 			r = ct;
 		} else if(command[0].equalsIgnoreCase("insert") && command[1].equalsIgnoreCase("into")) {
 			String[] tmp = input.split("\\(", 2);
-			if(tmp.length < 2)
-				throw new Exception("Syntax Error: open bracket (");
-			command = tmp[0].split(" ");
-			// TODO: close bracket not check.
+			if(tmp.length < 2 || !tmp[1].contains(")"))
+				throw new Exception("Syntax Error: bracket ()");
 			
+			command = tmp[0].split(" ");
 			if(command.length == 4 && !command[3].equalsIgnoreCase("values")){
 				throw new Exception("Command Not Found.");
 			} else if(command.length == 4) {	// INSERT INTO table VALUES ();
@@ -57,8 +55,7 @@ public class Parser {
 			s.parseValue(input);
 			r = s;
 		} else if(command[0].equalsIgnoreCase("import")) {
-			
-			ImportFile im = new ImportFile(Command.Import, command[1]);
+			ImportFile im = new ImportFile(Command.ImportFile, command[1]);
 			r = im;
 		} else {
 			r = new SQLRequest(Command.Error);

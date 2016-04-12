@@ -11,7 +11,7 @@ public class Main {
 	public static TableList ct;
 	//public static InsertTb it;
 	
-	public static String[] getFileContent(String fileName){
+	public static String[] getFileContent(String fileName) {
 		
 		FileReader file;
 		BufferedReader br;
@@ -35,6 +35,7 @@ public class Main {
 		
 		return output;
 	}
+	
 	public static void main(String[] argc) {
 		
 		Scanner scanner = new Scanner(System.in);
@@ -142,6 +143,10 @@ public class Main {
 						
 						
 						break;
+					case ImportFile:
+						ImportFile im = (ImportFile)parser.r;
+						Main.getFileContent(im.name);
+						break;
 					default:
 				}
 				
@@ -149,7 +154,7 @@ public class Main {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());
-				//e.printStackTrace();
+				e.printStackTrace();
 			}	
 	
 		}

@@ -131,6 +131,8 @@ public class Select extends SQLRequest{
 	
 	public void doSelectFunction(TableList ct){
 		
+		int col_index0 = 0;
+		int col_index1 = 0;
 		List<String> ls0 = colName.get(0);
 		List<String> ls1 = colName.get(1);
 		
@@ -139,6 +141,33 @@ public class Select extends SQLRequest{
 		
 		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0), ls0.get(1));
 		List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0), ls1.get(1));
+	
+		
+		// 找尋目標的col 是第幾個
+		for(String tmp:ls0_table_colname){
+			if(tmp.equals(ls0.get(1))){
+				
+			}else{
+				col_index0++;
+			}
+		}
+		
+		for(String tmp:ls1_table_colname){
+			if(tmp.equals(ls1.get(1))){
+				
+			}else{
+				col_index1++;
+			}
+		}
+		
+		for(TableList.row_node col0 : subls0){
+			for(TableList.row_node col1 : subls1){
+				if(){
+					
+				}
+			}
+			
+		}
 		
 		
 		

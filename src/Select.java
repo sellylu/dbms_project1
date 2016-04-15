@@ -129,6 +129,21 @@ public class Select extends SQLRequest{
 		}
 	}
 	
+	public void doSelectFunction(TableList ct){
+		
+		List<String> ls0 = colName.get(0);
+		List<String> ls1 = colName.get(1);
+		
+		String[] ls0_table_colname = ct.getColName(ls0.get(0));
+		String[] ls1_table_colname = ct.getColName(ls1.get(0));
+		
+		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0), ls0.get(1));
+		List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0), ls1.get(1));
+		
+		
+		
+	}
+	
 	public List<List<String>> colName;
 	public String[] tableName;
 	public String[] condition;

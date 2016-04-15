@@ -20,19 +20,20 @@ public class Main {
 			file = new FileReader(fileName);
 		    br=new BufferedReader(file);
 			while ((line=br.readLine()) != null) {
-				filecontent = filecontent + line;
+				filecontent = filecontent + " " + line;
 			}
+			int n = filecontent.codePointCount(0, filecontent.length());
+			String []output = new String[n];
+			output = filecontent.split(";");
+			
+			return output;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			System.out.printf("File no exist");
+			System.out.println("File doesn't exist");
 		} catch (IOException e){
 		}
 		
-		int n = filecontent.codePointCount(0, filecontent.length());
-		String []output = new String[n];
-		output = filecontent.split(";");
-		
-		return output;
+		return null;
 	}
 	
 	public static void main(String[] argc) {
@@ -40,14 +41,14 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		Parser parser;
 		ct = new TableList();
-		//it = new InsertTb();
 		
+		List<String> remains = new ArrayList<String>();
 		String command;
-		String[] tmp;
 		while(true){
 			command = "";
 
-			do {
+			String[] tmp;
+			while(command.length() <= 1024 && remains.isEmpty()) {
 				String input = scanner.nextLine();
 				
 				if(input.indexOf(";") > 0) {
@@ -68,8 +69,12 @@ public class Main {
 					else
 						command = command.concat(input);
 				}
-			} while(command.length() <= 1024);
+			}
 			
+			if(!remains.isEmpty()) {
+				command = remains.get(0);
+				remains.remove(0);
+			}
 			
 			
 			try {
@@ -148,12 +153,15 @@ public class Main {
 						break;
 					case ImportFile:
 						ImportFile im = (ImportFile)parser.r;
-						Main.getFileContent(im.name);
+						String[] in = getFileContent(im.name);
+						if(in != null)
+							remains.addAll(Arrays.asList(in));
 						break;
 					default:
 				}
 				
-				ct.printtb();
+				if(remains.size() == 0)
+					ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());

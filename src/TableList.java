@@ -256,14 +256,26 @@ public class TableList {
 			
 			if(tablename == null){
 				int count = 0;
+				int site = 0;
+				String useToSetNonTableNameCol = null;
 				for(String tmp_input_table_name : input_table_name){
 					if(ifExistCol(tmp_input_table_name,colname) == true){
+						site = count;
+						useToSetNonTableNameCol = tmp_input_table_name;
 						count++;
+						
+					}else{
+						System.out.println("沒有table存在此col");
+						return false;
 					}
+					
 					if(count ==2){
 						System.out.println("conflict了～～～");
+						return false;
 					}
 				}
+				a.set(site, useToSetNonTableNameCol);
+				
 				
 			}
 			
@@ -271,6 +283,7 @@ public class TableList {
 			else{
 				if(!ifExistCol(tablename,colname)){
 					System.out.println("沒這col name");
+					return false;
 				};
 			}
 			

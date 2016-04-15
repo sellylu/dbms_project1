@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
  
@@ -290,6 +291,27 @@ public class TableList {
 			
 		}
 		return true;
+		
+	}
+	
+	public List<row_node> return_colList(String tableName,String colName){
+		table_node tn = head_tb;
+		
+		int checknowTable =0;
+		List<row_node> colList = new ArrayList<row_node>();
+		while(checknowTable !=1){
+			if(tn.tablename.equals(tableName)){
+				
+				row_node rn = tn.rowlist.now_row;
+				while(rn.next_row != null){
+					colList.add(rn);
+				}
+				checknowTable = 1;
+			}
+			tn = tn.next_table;
+		}
+		return colList;
+			
 		
 	}
 }

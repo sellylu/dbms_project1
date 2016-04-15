@@ -9,7 +9,6 @@ import java.util.*;
 public class Main {
 	
 	public static TableList ct;
-	//public static InsertTb it;
 	
 	public static String[] getFileContent(String fileName) {
 		
@@ -140,7 +139,7 @@ public class Main {
 						break;
 					case Select:
 						Select s = (Select)parser.r;
-						ct.checkColInTable(s.tableName,s.colName);
+						//ct.checkColInTable(s.tableName,s.colName);
 						
 						break;
 					case ImportFile:
@@ -154,7 +153,7 @@ public class Main {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());
-				//e.printStackTrace();
+				e.printStackTrace();
 			}	
 	
 		}

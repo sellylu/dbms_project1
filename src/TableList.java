@@ -239,7 +239,7 @@ public class TableList {
 		return false;
 	}
 	
-	public boolean checkColInTable(String[] input_table_name,List<List<String>> input_colname){
+	public boolean checkColInTable(List<List<String>> input_table_name,List<List<String>> input_colname){
 		
 		// 判斷是否都存在其table
 		
@@ -259,10 +259,10 @@ public class TableList {
 				int count = 0;
 				int site = 0;
 				String useToSetNonTableNameCol = null;
-				for(String tmp_input_table_name : input_table_name){
-					if(ifExistCol(tmp_input_table_name,colname) == true){
+				for(List<String> tmp_input_table_name : input_table_name){
+					if(ifExistCol(tmp_input_table_name.get(0),colname) == true){
 						site = count;
-						useToSetNonTableNameCol = tmp_input_table_name;
+						useToSetNonTableNameCol = tmp_input_table_name.get(0);
 						count++;
 						
 					}else{

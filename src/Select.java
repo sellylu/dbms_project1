@@ -15,12 +15,13 @@ public class Select extends SQLRequest{
 		input = input.replaceAll(", ", ",").toLowerCase();
 										
 		String from = input.split("from")[1].trim();
+		String[] where;
 		if(from.contains("where")) {
-			this.tableName = from.split("where")[0].trim().split(",");
+			where = from.split("where")[0].trim().split(",");
 		} else {
-			this.tableName = from.split(",");
+			where = from.split(",");
 		}
-		tableLength = this.tableName.length;
+		tableLength = where.length;
 		if(input.contains("where")) {
 			String cond = input.split("where")[1].trim();
 			parseCondition(cond);
@@ -30,7 +31,7 @@ public class Select extends SQLRequest{
 		if(input.contains("count(") || input.contains("sum(")) {
 			parseAggr(col);
 		} else {
-			parseColTable(col);
+			parseColTable(where, col);
 		}
 		
 		for(List<String> l: this.colName) {
@@ -41,22 +42,23 @@ public class Select extends SQLRequest{
 
 	}
 	
-	private void parseColTable(String[] col) throws Exception {
+	private void parseColTable(String[] where, String[] col) throws Exception {
 		// parse column and table
 		int i = 0;	
 		for(String c: col) {
 			this.colName.add(new ArrayList<String>());
 			int j = 0;
-			for(String t: this.tableName) {
+			for(String t: where) {
 				String[] tmp_c = c.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				List<String> tmp_t = Arrays.asList(t.split(" as "));	// Table as t	tmp_t[0]=>Table	tmp_t[1]=>t
 			
 				// check table
 				if(i == 0 && Main.ct.checktablename(tmp_t.get(0)) == null) {
 					throw new Exception("table " + tmp_t.get(0) + " not exist.");
-				} else {
-				// pass
-					this.tableName[j] = tmp_t.get(0);
+				} else if(i == 0) {
+					// pass
+					this.tableName.add(new ArrayList<String>());
+					this.tableName.set(j, tmp_t);
 				}
 					
 				if(tmp_c.length == 1) {		// ambiguous variable
@@ -79,35 +81,42 @@ public class Select extends SQLRequest{
 	}
 	
 	private void parseCondition(String cond) throws Exception {
+		String[] expr;
 		if(cond.contains(" and ")) {
 			op = 1;
-			condition = cond.split(" and ");
+			expr = cond.split(" and ");
 		} else if(cond.contains(" or ")) {
 			this.op = 2;
-			this.condition = cond.split(" or ");
+			expr = cond.split(" or ");
 		} else {
 			this.op = 0;
-			this.condition = new String[1];
-			this.condition[0] = cond;
+			expr = new String[1];
+			expr[0] = cond;
 		}
+		int i = 0;
 		// let parse by space
-		for(String s : this.condition) {
+		for(String s : expr) {
+			this.condition.add(new ArrayList<String>());
 			s.replaceAll(" ", "");
+			String[] tmp;
 			if(s.contains("<>")) {
-				String[] tmp = s.split("<>");
-				s = tmp[0] + " <> " + tmp[1];
+				tmp = s.split("<>");
+				this.operator.add(0);
 			} else if(s.contains("<")) {
-				String[] tmp = s.split("<");
-				s = tmp[0] + " < " + tmp[1];					
+				tmp = s.split("<");					
+				this.operator.add(1);
 			} else if(s.contains(">")) {
-				String[] tmp = s.split(">");
-				s = tmp[0] + " > " + tmp[1];
+				tmp = s.split(">");
+				this.operator.add(2);
 			} else if(s.contains("=")) {
-				String[] tmp = s.split("=");
-				s = tmp[0] + " = " + tmp[1];
+				tmp = s.split("=");
+				this.operator.add(3);
 			} else {
 				throw new Exception("Syntax error: around where, operator not found");
 			}
+			parseExpression(tmp);
+
+			i++;
 		}
 	}
 	
@@ -123,7 +132,7 @@ public class Select extends SQLRequest{
 				tmp = c.split("sum\\(")[1].split("\\)")[0];
 			}
 			this.colName.add(new ArrayList<String>());
-			this.colName.get(i).add(this.tableName[0]);
+			this.colName.get(i).add(this.tableName.get(0).get(0));
 			this.colName.get(i).add(tmp);
 			i++;
 		}
@@ -173,9 +182,36 @@ public class Select extends SQLRequest{
 		
 	}
 	
+	private String findTableName(String in) {
+		for(List<String> l: this.tableName) {
+			for(String s: l) {
+				if(s.equals(in)) {
+					return s;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private void parseExpression(String[] tmp) {
+		int j = 0;
+		for(String ex: tmp) {
+			String[] tmp_c = ex.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
+			if(tmp_c.length == 1) {		// ambiguous variable
+				this.condition.get(j).add(null);
+				this.condition.get(j).add(tmp_c[0]);
+			} else if(this.tableName.contains(tmp_c[0])) {	// Table.col or t.col
+				String t = findTableName(tmp_c[0]);
+				this.condition.get(j).add(t);
+				this.condition.get(j).add(tmp_c[1]);
+			}
+		}
+	}
+	
 	public List<List<String>> colName;
-	public String[] tableName;
-	public String[] condition;
+	public List<List<String>> tableName;
+	public List<List<String>> condition;
+	public List<Integer> operator;	// 0 for <>; 1 for <; 2 for >; 3 for =
 	public int tableLength;
 	public int op = 0;	// 0 for none; 1 for and; 2 for or
 	public int aggr = 0;	// 0 for none; 1 for count; 2 for sum

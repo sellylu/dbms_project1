@@ -160,7 +160,7 @@ public class Main {
 					default:
 				}
 				
-				if(remains.size() == 0)
+				if(remains.size() == 0 && parser.r.getCommand() != Command.Select)
 					ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

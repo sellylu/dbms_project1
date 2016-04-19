@@ -6,3 +6,5 @@ authorId int, editorial varchar(30)
 CREATE TABLE Author (
 authorId int PRIMARY KEY, name varchar(30), nationality varchar(30)
 );
+IMPORT book2.sql;
+IMPORT author.sql;

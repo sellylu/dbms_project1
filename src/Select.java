@@ -20,8 +20,12 @@ public class Select extends SQLRequest{
 		String[] where;
 		if(from.contains("where")) {
 			where = from.split("where")[0].trim().split(",");
+			if(from.split("where")[0].trim().isEmpty())
+				throw new Exception("Syntax Error: no table name found.");
 		} else {
 			where = from.split(",");
+			if(from.isEmpty())
+				throw new Exception("Syntax Error: no table name found.");
 		}
 		constructTable(where);
 		if(input.contains("where")) {
@@ -29,27 +33,15 @@ public class Select extends SQLRequest{
 			parseCondition(cond);
 		}
 		
+		if(input.split("select")[1].trim().split("from")[0].trim().isEmpty())
+			throw new Exception("Syntax Error: no column name found.");
+		
 		String[] col = input.split(" ",3)[1].trim().split(",");
 		if(input.contains("count(") || input.contains("sum(")) {
 			parseAggr(col);
 		} else {
 			parseColTable(col);
 		}
-		
-		System.out.println("colName");
-		for(List<String> l: this.colName) {
-			for(String s: l) {
-				System.out.println(s);
-			}
-		}
-		System.out.println("tableName");
-		for(List<String> l: this.tableName) {
-			for(String s: l) {
-				System.out.println(s);
-			}
-		}
-		System.out.println("op " + this.op);
-		System.out.println("aggr " + this.aggr);
 
 	}
 	
@@ -68,6 +60,24 @@ public class Select extends SQLRequest{
 				this.colName.get(i).add(t);
 				this.colName.get(i).add(tmp_c[1]);
 			}
+			i++;
+		}
+	}
+	
+	private void parseAggr(String[] col) {
+		int i = 0;
+		for(String c: col) {
+			String tmp = new String();
+			if(c.contains("count(")) {
+				aggr = 1;
+				tmp = c.split("\\(")[1].split("\\)")[0];
+			} else if(c.contains("sum(")) {
+				aggr = 2;
+				tmp = c.split("\\(")[1].split("\\)")[0];
+			}
+			this.colName.add(new ArrayList<String>());
+			this.colName.get(i).add(this.tableName.get(0).get(0));
+			this.colName.get(i).add(tmp);
 			i++;
 		}
 	}
@@ -92,38 +102,20 @@ public class Select extends SQLRequest{
 			String[] tmp;
 			if(s.contains("<>")) {
 				tmp = s.split("<>");
-				this.condition.addAll(new ArrayList<ConditionStruct>(0));
+				this.condition.add(new ConditionStruct(0));
 			} else if(s.contains("<")) {
 				tmp = s.split("<");					
-				this.condition.addAll(new ArrayList<ConditionStruct>(1));
+				this.condition.add(new ConditionStruct(1));
 			} else if(s.contains(">")) {
 				tmp = s.split(">");
-				this.condition.addAll(new ArrayList<ConditionStruct>(2));
+				this.condition.add(new ConditionStruct(2));
 			} else if(s.contains("=")) {
 				tmp = s.split("=");
-				this.condition.addAll(new ArrayList<ConditionStruct>(3));
+				this.condition.add(new ConditionStruct(3));
 			} else {
 				throw new Exception("Syntax error: around where, operator not found");
 			}
 			parseExpression(tmp[0].trim(), tmp[1].trim(), this.condition.get(i));
-			i++;
-		}
-	}
-	
-	private void parseAggr(String[] col) {
-		int i = 0;
-		for(String c: col) {
-			String tmp = new String();
-			if(c.contains("count(")) {
-				aggr = 1;
-				tmp = c.split("count\\(")[1].split("\\)")[0];
-			} else if(c.contains("sum(")) {
-				aggr = 2;
-				tmp = c.split("sum\\(")[1].split("\\)")[0];
-			}
-			this.colName.add(new ArrayList<String>());
-			this.colName.get(i).add(this.tableName.get(0).get(0));
-			this.colName.get(i).add(tmp);
 			i++;
 		}
 	}
@@ -133,13 +125,15 @@ public class Select extends SQLRequest{
 		int col_index0 = 0;
 		int col_index1 = 0;
 		List<String> ls0 = colName.get(0);
-		List<String> ls1 = colName.get(1);
+		//List<String> ls1 = colName.get(1);
 		
+		 
+	
 		String[] ls0_table_colname = ct.getColName(ls0.get(0));
-		String[] ls1_table_colname = ct.getColName(ls1.get(0));
+		//String[] ls1_table_colname = ct.getColName(ls1.get(0));
 		
-		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0), ls0.get(1));
-		List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0), ls1.get(1));
+		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0));
+		//List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0));
 	
 		
 		// 找尋目標的col 是第幾個
@@ -151,24 +145,93 @@ public class Select extends SQLRequest{
 			}
 		}
 		
-		for(String tmp:ls1_table_colname){
+		/*for(String tmp:ls1_table_colname){
 			if(tmp.equals(ls1.get(1))){
 				
 			}else{
 				col_index1++;
 			}
 		}
-	/*	
-		for(TableList.row_node col0 : subls0){
-			for(TableList.row_node col1 : subls1){
-				if(){
-					
-				}
-			}
+		*/
+	//where a.name = "sss";
+		ConditionStruct tmp0 = null;
+		ConditionStruct tmp1 = null;
+		ConditionStruct tmp2 = null;
+		ConditionStruct tmp3 = null;
+		// 判斷 From 多少table
+		
+		int table_count = this.tableName.size();
+		String tablename0,tablename1 = null;
+		switch(table_count){
 			
+			case 1:
+				tablename0 = this.tableName.get(0).get(0);
+				// 取出table的全部col
+				List<TableList.row_node> tn0_allRow = ct.return_colList(tablename0);
+				String []tablecolname = ct.getColName(tablename0);
+				List<Integer> indexoftargetcol = new ArrayList<Integer>();
+				
+				
+				// 把要拿出來的col 在原本table裡的位置存出來
+				for(List<String> targetcol: this.colName){
+					for(String c : tablecolname){
+						int tmpc = 0;
+						if(targetcol.get(1).equalsIgnoreCase(c)){
+							indexoftargetcol.add(tmpc);
+							tmpc = 0;
+							break;
+						}else{
+							tmpc++;
+						}
+					}
+				}
+				
+				
+				//得到condition
+				int lenofcondition = this.condition.size();
+				switch(lenofcondition){
+					case 0:
+						// 沒有 where
+						//select name,apple
+						//from table
+						for(TableList.row_node tmp_lr : tn0_allRow){
+							for(int a:indexoftargetcol){
+								System.out.print(tmp_lr.data[a] + "  ");
+							}
+							System.out.print("\n");
+							
+							//condition 是否成立
+							
+						}
+						break;
+					case 2:
+						
+						//one condition
+						break;
+					case 4:
+						// two condition
+						
+						break;
+					default:
+						System.out.println("wrong");
+						break;
+				}
+
+				
+				
+				break;
+			case 2:
+				tablename0 = this.tableName.get(0).get(0);
+				tablename1 = this.tableName.get(1).get(0);
+				break;
+			default:
+				break;
 		}
 		
-		*/
+		
+		
+		
+		
 		
 	}
 	
@@ -182,8 +245,8 @@ public class Select extends SQLRequest{
 				throw new Exception("table " + tmp_t[0] + " not exist.");
 			} else if(tmp_t.length == 1) {
 				this.tableName.add(new ArrayList<String>());
-				this.tableName.get(i).set(0, null);
-				this.tableName.get(i).set(1, tmp_t[0]);
+				this.tableName.get(i).add(tmp_t[0]);
+				this.tableName.get(i).add(null);
 			} else {
 				// pass
 				this.tableName.add(new ArrayList<String>());
@@ -217,7 +280,7 @@ public class Select extends SQLRequest{
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					cs.valueLeft = tmp_c[1];
+					cs.valueLeft = tmp_c[0];
 				} else if(t != null) {	// Table.col or t.col
 					cs.valueLeft = t.concat("." + tmp_c[1]);
 				}
@@ -238,10 +301,11 @@ public class Select extends SQLRequest{
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					cs.valueLeft = tmp_c[1];
+					cs.valueLeft = tmp_c[0];
 				} else if(t != null) {	// Table.col or t.col
 					cs.valueLeft = t.concat("." + tmp_c[1]);
-				}			}
+				}			
+			}
 		}
 	}
 	

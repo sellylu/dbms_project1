@@ -140,6 +140,7 @@ public class Select extends SQLRequest{
 		int lenofcondition = 0;
 		int tmpc =0;
 		int count = 0;
+		int sum = 0;
 		int targetindex0=0;
 		int targetindex1=0;
 		int targetindex2=0;
@@ -712,36 +713,60 @@ public class Select extends SQLRequest{
 					 			}
 				 				break;
 				 			}
-
 							// end of switch lefttype
 							
 							
 							switch(this.op){
 								case 1:
 									int c =0;
+									count = 0;
+									sum = 0;
 									for(TableList.row_node tmp_lr : tn0_allRow){
-											
-											if(checkList0.get(c) + checkList1.get(c) == 2){
-												for(int a:indexoftargetcol_onetable){
+										if(checkList0.get(c) + checkList1.get(c) == 2){
+											count++;
+											for(int a:indexoftargetcol_onetable){
+												if(this.aggr == 0) {
 													System.out.print(tmp_lr.data[a] + "  ");
+												} else if(this.aggr == 2) {
+													int tmp = Integer.parseInt(tmp_lr.data[a]);
+													sum += tmp;
 												}
-												System.out.println();
 											}
-											c++;
+											if(this.aggr == 0)
+												System.out.println();
+										}
+										c++;
 									}
+									if(this.aggr == 1)
+										System.out.println(count);
+									if(this.aggr == 2)
+										System.out.println(sum);
 									
 									break;
 								case 2:
 									int d =0;
+									count = 0;
+									sum = 0;
 									for(TableList.row_node tmp_lr : tn0_allRow){
 										if(checkList0.get(d) + checkList1.get(d) >0){
-												for(int a:indexoftargetcol_onetable){
+											count++;
+											for(int a:indexoftargetcol_onetable){
+												if(this.aggr == 0) {
 													System.out.print(tmp_lr.data[a] + "  ");
+												} else if(this.aggr == 2) {
+													int tmp = Integer.parseInt(tmp_lr.data[a]);
+													sum += tmp;
 												}
+											}
+											if(this.aggr == 0)
 												System.out.println();
 										}
 										d++;
 									}
+									if(this.aggr == 1)
+										System.out.println(count);
+									if(this.aggr == 2)
+										System.out.println(sum);
 									break;
 							}
 							

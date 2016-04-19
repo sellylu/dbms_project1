@@ -1538,13 +1538,14 @@ public class Select extends SQLRequest{
 						// end of case 1
 						
 					case 2:
-					
+					/*
 						// 取出table的全部col
 						tn0_allRow = ct.return_colList(tablename0);
 						tn1_allRow = ct.return_colList(tablename1);
 						table0colname = ct.getColName(tablename0);
 						table1colname = ct.getColName(tablename1);
 						indexoftargetcol_twotable= new ArrayList<List<Integer>>();
+						*/
 						// two condition
 						doit =0;
 						checkList0 = new ArrayList<Integer>();
@@ -1595,8 +1596,6 @@ public class Select extends SQLRequest{
 							
 								switch(condition0.operator){
 									case 0:
-										switch(this.aggr) {
-											case 0:
 												for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1632,50 +1631,43 @@ public class Select extends SQLRequest{
 														}
 													}
 												}
-													
-												
 												break;
 											
-							 			case 3:
-							 				switch(this.aggr) {
-								 				case 0:
-								 					for(TableList.row_node tmp_lr : tn0_allRow){
-														for(TableList.row_node tmp_lr2 : tn1_allRow){
-															if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
-																if(condition0.tableRight.equalsIgnoreCase(tablename0)){
-																	if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
-																		doit =1;
-																	}
-																}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
-																	if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
-																		doit =1;
-																	}
+							 		case 3:
+								 				for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
+																	doit =1;
 																}
-															}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
-																if(condition0.tableRight.equalsIgnoreCase(tablename0)){
-																	if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){                   
-																		doit =1;
-																	}
-																}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
-																	if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
-																		doit =1;
-																	}
+															}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																	doit =1;
 																}
-																
 															}
-															if(doit ==1){
-																checkList0.add(1);
-																doit=0;
-															}else{
-																checkList0.add(0);
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){                   
+																	doit =1;
+																}
+															}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																	doit =1;
+																}
 															}
+															
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
 														}
 													}
-						 						break;
+												}
 							 				
-							 				}
-							 				break;
-					 			}
+							 		}
 								break;
 							case 1:
 						 		//右邊是字串
@@ -1702,8 +1694,6 @@ public class Select extends SQLRequest{
 						 		
 						 		switch(condition0.operator){
 						 			case 0:
-						 				switch(this.aggr) {
-						 					case 0:
 						 						for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1725,12 +1715,7 @@ public class Select extends SQLRequest{
 													}
 												}
 								 				break;
-						 					
-						 				}
-						 				break;
 						 			case 3:
-						 				switch(this.aggr) {
-						 					case 0:
 						 						for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1752,9 +1737,6 @@ public class Select extends SQLRequest{
 													}
 												}
 						 						break;
-						 					
-						 				}
-						 				break;
 						 		}
 					 			break;
 						 	case 2:
@@ -1782,8 +1764,6 @@ public class Select extends SQLRequest{
 						 			
 					 			switch(condition0.operator){
 						 			case 0:
-						 				switch(this.aggr) {
-						 					case 0:
 						 						for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1806,11 +1786,7 @@ public class Select extends SQLRequest{
 												}
 						 						break;
 						 					
-						 				}
-						 				break;
 									case 1:
-										switch(this.aggr) {
-											case 0:
 												for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1832,11 +1808,7 @@ public class Select extends SQLRequest{
 													}
 												}
 												break;
-										}
-						 				break;
 									case 2:
-										switch(this.aggr) {
-											case 0:
 												for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1859,11 +1831,7 @@ public class Select extends SQLRequest{
 												}
 												break;
 											
-										}
-						 				break;
 									case 3:
-										switch(this.aggr) {
-											case 0:
 												for(TableList.row_node tmp_lr : tn0_allRow){
 													for(TableList.row_node tmp_lr2 : tn1_allRow){
 														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1885,8 +1853,7 @@ public class Select extends SQLRequest{
 													}
 												}
 												break;
-										}
-										break;
+
 					 			}
 				 				break;
 				 		}
@@ -1933,8 +1900,6 @@ public class Select extends SQLRequest{
 								
 									switch(condition1.operator){
 										case 0:
-											switch(this.aggr) {
-												case 0:
 													for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -1975,8 +1940,6 @@ public class Select extends SQLRequest{
 													break;
 												
 								 			case 3:
-								 				switch(this.aggr) {
-									 				case 0:
 									 					for(TableList.row_node tmp_lr : tn0_allRow){
 															for(TableList.row_node tmp_lr2 : tn1_allRow){
 																if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2011,8 +1974,6 @@ public class Select extends SQLRequest{
 														}
 							 						break;
 								 				
-								 				}
-								 				break;
 						 			}
 									break;
 								case 1:
@@ -2040,8 +2001,6 @@ public class Select extends SQLRequest{
 							 		
 							 		switch(condition1.operator){
 							 			case 0:
-							 				switch(this.aggr) {
-							 					case 0:
 							 						for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2064,11 +2023,7 @@ public class Select extends SQLRequest{
 													}
 									 				break;
 							 					
-							 				}
-							 				break;
 							 			case 3:
-							 				switch(this.aggr) {
-							 					case 0:
 							 						for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2091,8 +2046,6 @@ public class Select extends SQLRequest{
 													}
 							 						break;
 							 					
-							 				}
-							 				break;
 							 		}
 						 			break;
 							 	case 2:
@@ -2120,8 +2073,6 @@ public class Select extends SQLRequest{
 							 			
 						 			switch(condition1.operator){
 							 			case 0:
-							 				switch(this.aggr) {
-							 					case 0:
 							 						for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2144,11 +2095,7 @@ public class Select extends SQLRequest{
 													}
 							 						break;
 							 					
-							 				}
-							 				break;
 										case 1:
-											switch(this.aggr) {
-												case 0:
 													for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2170,11 +2117,7 @@ public class Select extends SQLRequest{
 														}
 													}
 													break;
-											}
-							 				break;
 										case 2:
-											switch(this.aggr) {
-												case 0:
 													for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2196,12 +2139,7 @@ public class Select extends SQLRequest{
 														}
 													}
 													break;
-												
-											}
-							 				break;
 										case 3:
-											switch(this.aggr) {
-												case 0:
 													for(TableList.row_node tmp_lr : tn0_allRow){
 														for(TableList.row_node tmp_lr2 : tn1_allRow){
 															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
@@ -2223,12 +2161,10 @@ public class Select extends SQLRequest{
 														}
 													}
 													break;
-											}
-											break;
 						 			}
 					 				break;
-									}
 								}
+
 								
 								switch(this.op){
 								case 1:
@@ -2245,6 +2181,7 @@ public class Select extends SQLRequest{
 														
 													}
 												}
+												System.out.println();
 											}
 											c++;
 										}
@@ -2267,6 +2204,7 @@ public class Select extends SQLRequest{
 														
 													}
 												}
+												System.out.println();
 											}
 											d++;
 										}
@@ -2280,7 +2218,7 @@ public class Select extends SQLRequest{
 						
 						// end of two condition
 						break;
-						}
+
 					default:
 						System.out.println("wrong");
 						break;

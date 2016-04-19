@@ -148,23 +148,20 @@ public class Select extends SQLRequest{
 				table0colname = ct.getColName(tablename0);
 				indexoftargetcol_onetable = new ArrayList<Integer>();
 				
-				
 				// 把要拿出來的col 在原本table裡的位置存出來
 				for(List<String> targetcol: this.colName){
 					String col = targetcol.get(1);
 					tmpc = 0;
 					for(String c : table0colname){
-						if(col.equals("*")) {
+						if(col.equals("*") || col.equalsIgnoreCase(c)) {
 							indexoftargetcol_onetable.add(tmpc);
-						} else if(col.equalsIgnoreCase(c)) {
-							indexoftargetcol_onetable.add(tmpc);
-							tmpc = 0;
-							break;
+							if(col.equalsIgnoreCase(c)) {
+								break;
+							}
 						}
 						tmpc++;
 					}
 				}
-				
 				
 				//得到condition
 				lenofcondition = this.condition.size();
@@ -211,33 +208,29 @@ public class Select extends SQLRequest{
 					tmpc = 0;
 					if(targetcol.get(0).equals(tablename0)){
 						for(String c : table0colname){
-							
-							if(targetcol.get(1).equalsIgnoreCase(c)){
-								
+							String col = targetcol.get(1);
+							if(col.equals("*") || col.equalsIgnoreCase(c)) {
 								tmpLI = new ArrayList<Integer>();
 								tmpLI.add(tmpc);
 								tmpLI.add(0);
 								indexoftargetcol_twotable.add(tmpLI);
-								tmpc = 0;
-								break;
-							}else{
-								tmpc++;
+								if (col.equalsIgnoreCase(c))
+									break;
 							}
+							tmpc++;
 						}
-					}else if(targetcol.get(0).equals(tablename1)){
+					} else if(targetcol.get(0).equals(tablename1)){
 						for(String c : table1colname){
-							
-							if(targetcol.get(1).equalsIgnoreCase(c)){
-								
+							String col = targetcol.get(1);
+							if(col.equals("*")) {
 								tmpLI = new ArrayList<Integer>();
 								tmpLI.add(tmpc);
 								tmpLI.add(1);
 								indexoftargetcol_twotable.add(tmpLI);
-								tmpc = 0;
-								break;
-							}else{
-								tmpc++;
+								if(col.equalsIgnoreCase(c))
+									break;
 							}
+							tmpc++;
 						}
 					}
 				}
@@ -263,7 +256,6 @@ public class Select extends SQLRequest{
 								
 							}
 							
-							
 							//condition 是否成立
 							
 						}
@@ -280,10 +272,7 @@ public class Select extends SQLRequest{
 						System.out.println("wrong");
 						break;
 				}
-				
-				
-				
-				
+					
 				
 				break;
 			default:

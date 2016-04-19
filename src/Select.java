@@ -134,6 +134,8 @@ public class Select extends SQLRequest{
 		List<TableList.row_node> tn1_allRow = null;
 		String []table0colname = null;
 		String []table1colname = null;
+		String []table0datatype = null;
+		String []table1datatype = null;
 		List<Integer> indexoftargetcol_onetable = null;
 		List<List<Integer>> indexoftargetcol_twotable = null;
 		int lenofcondition = 0;
@@ -147,6 +149,7 @@ public class Select extends SQLRequest{
 				// 取出table的全部col
 				tn0_allRow = ct.return_colList(tablename0);
 				table0colname = ct.getColName(tablename0);
+				table0datatype = ct.getDataType(tablename0);
 				indexoftargetcol_onetable = new ArrayList<Integer>();
 				
 				// 把要拿出來的col 在原本table裡的位置存出來
@@ -174,28 +177,46 @@ public class Select extends SQLRequest{
 						switch(this.aggr) {
 							case 0:
 								for(TableList.row_node tmp_lr : tn0_allRow){
-									for(int a:indexoftargetcol_onetable){
+									for(int a : indexoftargetcol_onetable){
 										System.out.print(tmp_lr.data[a] + "  ");
 									}
 									System.out.print("\n");
 								}
 								break;
 							case 1:
-								count = tn0_allRow.size();
+								count = 0;
+								for(TableList.row_node tmp_lr : tn0_allRow) {
+									for(int a : indexoftargetcol_onetable) {
+										if(tmp_lr.data[a] != null)
+											count++;
+									}
+								}
 								System.out.println(count);
 								break;
 							case 2:
+								count = 0;
+								for(TableList.row_node tmp_lr : tn0_allRow) {
+									int i = 0;
+									for(int a : indexoftargetcol_onetable) {
+										int tmp = Integer.parseInt(tmp_lr.data[a]);
+										if(table0datatype[i].equals("int")) {
+											count += tmp;
+										}
+										i++;
+									}
+								}
+								System.out.println(count);
 								break;
 							default:
 						}
 						
 
 						break;
-					case 2:
+					case 1:
 						
 						//one condition
 						break;
-					case 4:
+					case 2:
 						// two condition
 						
 						break;
@@ -280,11 +301,11 @@ public class Select extends SQLRequest{
 					}
 						
 						break;
-					case 2:
+					case 1:
 						
 						//one condition
 						break;
-					case 4:
+					case 2:
 						// two condition
 						
 						break;

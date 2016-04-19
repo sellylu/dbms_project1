@@ -122,38 +122,7 @@ public class Select extends SQLRequest{
 	
 	public void doSelectFunction(TableList ct){
 		
-		int col_index0 = 0;
-		int col_index1 = 0;
-		List<String> ls0 = colName.get(0);
-		//List<String> ls1 = colName.get(1);
-		
-		 
-	
-		String[] ls0_table_colname = ct.getColName(ls0.get(0));
-		//String[] ls1_table_colname = ct.getColName(ls1.get(0));
-		
-		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0));
-		//List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0));
-	
-		
-		// 找尋目標的col 是第幾個
-		for(String tmp:ls0_table_colname){
-			if(tmp.equals(ls0.get(1))){
-				
-			}else{
-				col_index0++;
-			}
-		}
-		
-		/*for(String tmp:ls1_table_colname){
-			if(tmp.equals(ls1.get(1))){
-				
-			}else{
-				col_index1++;
-			}
-		}
-		*/
-	//where a.name = "sss";
+		//where a.name = "sss";
 		ConditionStruct tmp0 = null;
 		ConditionStruct tmp1 = null;
 		ConditionStruct tmp2 = null;
@@ -174,15 +143,17 @@ public class Select extends SQLRequest{
 				
 				// 把要拿出來的col 在原本table裡的位置存出來
 				for(List<String> targetcol: this.colName){
+					String col = targetcol.get(1);
+					int tmpc = 0;
 					for(String c : tablecolname){
-						int tmpc = 0;
-						if(targetcol.get(1).equalsIgnoreCase(c)){
+						if(col.equals("*")) {
+							indexoftargetcol.add(tmpc);
+						} else if(col.equalsIgnoreCase(c)){
 							indexoftargetcol.add(tmpc);
 							tmpc = 0;
 							break;
-						}else{
-							tmpc++;
 						}
+						tmpc++;
 					}
 				}
 				

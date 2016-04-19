@@ -248,7 +248,7 @@ public class Select extends SQLRequest{
 								}
 								if(this.aggr == 1)
 									System.out.println(count/indexoftargetcol_onetable.size());
-								if(this.aggr == 3)
+								if(this.aggr == 2)
 									System.out.println(count);
 								break;
 							case 1:	//右邊是字串
@@ -277,7 +277,7 @@ public class Select extends SQLRequest{
 								}
 								if(this.aggr == 1)
 									System.out.println(count/indexoftargetcol_onetable.size());
-								if(this.aggr == 3)
+								if(this.aggr == 2)
 									System.out.println(count);
 								break;
 				 			}
@@ -488,7 +488,7 @@ public class Select extends SQLRequest{
 	
 	private void checkCol(String table, String col) throws Exception {
 		
-		if(!col.equals("*")){
+		if(!col.equals("*") && table == null){
 			String useToSetNonTableNameCol = null;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){

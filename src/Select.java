@@ -133,7 +133,6 @@ public class Select extends SQLRequest{
 		String []table0colname = null;
 		String []table1colname = null;
 		String []table0datatype = null;
-		String []table1datatype = null;
 		List<Integer> indexoftargetcol_onetable = null;
 		List<List<Integer>> indexoftargetcol_twotable = null;
 		int lenofcondition = 0;
@@ -191,7 +190,7 @@ public class Select extends SQLRequest{
 											count++;
 									}
 								}
-								System.out.println(count);
+								System.out.println(count/indexoftargetcol_onetable.size());
 								break;
 							case 2:
 								count = 0;
@@ -213,156 +212,382 @@ public class Select extends SQLRequest{
 
 						break;
 					case 1:
-						 condition0 = this.condition.get(0);
-						 switch(condition0.typeRight){
-						 		case 0:
-						 			targetindex0 = 0;
-						 			for(String t : table0colname){
-						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
-						 					break;
-						 				}else{
-						 					targetindex0++;
-						 				}
-						 			}
-						 			
-						 			targetindex1 = 0;
-						 			for(String t : table0colname){
-						 				if(t.equalsIgnoreCase(condition0.valueRight)){
-						 					break;
-						 				}else{
-						 					targetindex1++;
-						 				}
-						 			}
-						 			
-						 			switch(condition0.operator){
-					 					case 0:
-					 						for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
-														System.out.print(tmp_lr.data[a] + "  ");
+						condition0 = this.condition.get(0);
+						switch(condition0.typeRight){
+							case 0:
+								targetindex0 = 0;
+								for(String t : table0colname){
+									if(t.equalsIgnoreCase(condition0.valueLeft)){
+										break;
+					 				}else{
+					 					targetindex0++;
+					 				}
+								}
+								
+								targetindex1 = 0;
+								for(String t : table0colname){
+									if(t.equalsIgnoreCase(condition0.valueRight)){
+										break;
+									}else{
+										targetindex1++;
+									}
+								}
+								
+								switch(condition0.operator){
+									case 0:
+										switch(this.aggr) {
+											case 0:
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
+													if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+														System.out.print("\n");
 												}
-												if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
-													System.out.print("\n");
-											}
-					 						break;
-					 					case 3:
-					 						for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
-														System.out.print(tmp_lr.data[a] + "  ");
+												break;
+											case 1:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+															if(tmp_lr.data[a] != null)
+																count++;
+													}
 												}
-												if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
-													System.out.print("\n");
-											}
-					 						break;
-					 						
-						 			}
-						 			break;
-						 		case 1:
-						 			//右邊是字串
-						 			targetindex0 = 0;
-						 			for(String t : table0colname){
-						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
-						 					break;
-						 				}else{
-						 					targetindex0++;
+												System.out.println(count/indexoftargetcol_onetable.size());
+												break;
+											case 2:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+												break;
+										}
+
+						 				break;
+						 			case 3:
+						 				switch(this.aggr) {
+							 				case 0:
+								 				for(TableList.row_node tmp_lr : tn0_allRow){
+								 					for(int a:indexoftargetcol_onetable){
+								 						if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+								 							System.out.print(tmp_lr.data[a] + "  ");
+													}
+													if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+														System.out.print("\n");
+												}
+						 						break;
+							 				case 1:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1]))
+															if(tmp_lr.data[a] != null)
+																count++;
+													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+												break;
+							 				case 2:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+												break;
 						 				}
+						 				break;
+					 			}
+								break;
+							case 1:
+						 		//右邊是字串
+								targetindex0 = 0;
+								for(String t : table0colname){
+									if(t.equalsIgnoreCase(condition0.valueLeft)){
+										break;
+						 			}else{
+						 				targetindex0++;
 						 			}
-						 			
-						 			switch(condition0.operator){
-						 				case 0:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
-														System.out.print(tmp_lr.data[a] + "  ");
+						 		}
+						 		
+						 		switch(condition0.operator){
+						 			case 0:
+						 				switch(this.aggr) {
+						 					case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+										 			for(int a:indexoftargetcol_onetable){
+										 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))
+										 					System.out.print(tmp_lr.data[a] + "  ");
+													}
+													if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))
+														System.out.print("\n");
 												}
-												if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
-													System.out.print("\n");
-											}
-						 					break;
-
-						 				case 3:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
-														System.out.print(tmp_lr.data[a] + "  ");
+								 				break;
+						 					case 1:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+										 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))
+															if(tmp_lr.data[a] != null)
+																count++;
+													}
 												}
-												if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
-													System.out.print("\n");
-											}
-						 					break;
-						 			}
-					 				break;
-						 		case 2:
-						 			// 右邊是數字
-						 			// 取得左邊在第幾個位置
-						 			
-						 			targetindex0 = 0;
-						 			for(String t : table0colname){
-						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
-						 					break;
-						 				}else{
-						 					targetindex0++;
+												System.out.println(count/indexoftargetcol_onetable.size());
+						 						break;
+						 					case 2:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+										 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+						 						break;
 						 				}
-						 			}
+						 				break;
+						 			case 3:
+						 				switch(this.aggr) {
+						 					case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))      
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
+													if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))      
+														System.out.print("\n");
+												}
+						 						break;
+						 					case 1:
+						 						count = 0;
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))      
+															if(tmp_lr.data[a] != null)
+																count++;
+													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+						 						break;
+						 					case 2:
+												count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+										 				if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+						 						break;
+						 				}
+						 				break;
+						 		}
+					 			break;
+						 	case 2:
+								// 右邊是數字
+					 			// 取得左邊在第幾個位置
+					 			
+					 			targetindex0 = 0;
+					 			for(String t : table0colname){
+						 			if(t.equalsIgnoreCase(condition0.valueLeft)){
+						 				break;
+									}else{
+					 					targetindex0++;
+					 				}
+					 			}
 						 			
-						 			switch(condition0.operator){
-						 				case 0:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													
+					 			switch(condition0.operator){
+						 			case 0:
+						 				switch(this.aggr) {
+						 					case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){				
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
-														System.out.print(tmp_lr.data[a] + "  ");
+														System.out.print("\n");
 												}
-												if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
-													System.out.print("\n");
-											}
-						 					break;
-						 				case 1:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													
+						 						break;
+						 					case 1:
+						 						count = 0;
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){				
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
+															if(tmp_lr.data[a] != null)
+																count++;													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+						 						break;
+						 					case 2:
+						 						count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+						 						break;
+						 				}
+						 				break;
+									case 1:
+										switch(this.aggr) {
+											case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
-														System.out.print(tmp_lr.data[a] + "  ");
+														System.out.print("\n");
 												}
-												if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
-													System.out.print("\n");
-											}
-						 					break;
-						 				case 2:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
-													
+												break;
+											case 1:
+						 						count = 0;
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){				
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
+															if(tmp_lr.data[a] != null)
+																count++;													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+												break;
+											case 2:
+						 						count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+												break;
+										}
+						 				break;
+									case 2:
+										switch(this.aggr) {
+											case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
-														System.out.print(tmp_lr.data[a] + "  ");
+														System.out.print("\n");
 												}
-												if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
-													System.out.print("\n");
-											}
-						 					break;
-						 				case 3:
-
-								 			for(TableList.row_node tmp_lr : tn0_allRow){
-												for(int a:indexoftargetcol_onetable){
+												break;
+											case 1:
+						 						count = 0;
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){				
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
+															if(tmp_lr.data[a] != null)
+																count++;													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+												break;
+											case 2:
+						 						count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+												break;
+										}
+						 				break;
+									case 3:
+										switch(this.aggr) {
+											case 0:
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
+															System.out.print(tmp_lr.data[a] + "  ");
+													}
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
-														System.out.print(tmp_lr.data[a] + "  ");
+														System.out.print("\n");
 												}
-												if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
-													System.out.print("\n");
-											}
-						 					break;
-						 			}
-					 				break;
-						 }
+												break;
+											case 1:
+						 						count = 0;
+										 		for(TableList.row_node tmp_lr : tn0_allRow){
+													for(int a:indexoftargetcol_onetable){				
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
+															if(tmp_lr.data[a] != null)
+																count++;													}
+												}
+												System.out.println(count/indexoftargetcol_onetable.size());
+												break;
+											case 2:
+						 						count = 0;
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													int i = 0;
+													for(int a:indexoftargetcol_onetable){
+														int tmp = Integer.parseInt(tmp_lr.data[a]);
+														if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight)) {
+															if(table0datatype[i].equals("int")) 
+																count += tmp;
+														}
+														i++;
+													}
+												}
+												System.out.println(count);
+												break;
+										}
+										break;
+					 			}
+				 				break;
+				 			}
 						 						
-						//one condition
-						break;
-					case 2:
+							//one condition
+							break;
+						case 2:
 						// two condition
 						
 						break;
@@ -511,7 +736,7 @@ public class Select extends SQLRequest{
 		} catch (NumberFormatException e) {
 			if(left.startsWith("\\'") && left.endsWith("\\'")) {
 				cs.typeLeft = 1;
-				cs.valueLeft = left.substring(1, left.length()-1);
+				cs.valueLeft = left;
 			} else {
 				cs.typeLeft = 0;
 				String[] tmp_c = left.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
@@ -540,7 +765,7 @@ public class Select extends SQLRequest{
 		} catch (NumberFormatException e) {
 			if(right.startsWith("\'") && right.endsWith("\'")) {
 				cs.typeRight = 1;
-				cs.valueRight = right.substring(1, right.length()-1);
+				cs.valueRight = right;
 			} else {
 				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col

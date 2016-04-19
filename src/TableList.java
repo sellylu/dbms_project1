@@ -130,7 +130,7 @@ public class TableList {
 		for(String d : data){
 			
 			try{
-				if(d.equals("null")){
+				if(d.equalsIgnoreCase("null")){
 					datatype[i] = 3;
 					i++;
 					continue;
@@ -145,7 +145,7 @@ public class TableList {
 		}
 		
 		for(int a=0;a<now_table.datatype.length ;a++){
-			if(!data[a].equals("")){ //表示此insert的col有值
+			if(!data[a].isEmpty()){ //表示此insert的col有值
 				if(datatype[a] == 1 && now_table.datatype[a].equals("int")){
 					if(Integer.parseInt(data[a]) > Integer.MAX_VALUE){
 						return 1;
@@ -232,7 +232,7 @@ public class TableList {
 	public boolean ifExistCol(String tablename,String colname){
 		String [] colnames = getColName(tablename);
 		for(String tmp : colnames){
-			if(tmp.equals(colname)){
+			if(tmp.equalsIgnoreCase(colname)){
 				return true;
 			}
 		}
@@ -294,17 +294,18 @@ public class TableList {
 		
 	}
 	
-	public List<row_node> return_colList(String tableName,String colName){
+	public List<row_node> return_colList(String tableName){
 		table_node tn = head_tb;
 		
 		int checknowTable =0;
 		List<row_node> colList = new ArrayList<row_node>();
 		while(checknowTable !=1){
-			if(tn.tablename.equals(tableName)){
+			if(tn.tablename.equalsIgnoreCase(tableName)){
 				
-				row_node rn = tn.rowlist.now_row;
+				row_node rn = tn.rowlist.head_row;
 				while(rn.next_row != null){
 					colList.add(rn);
+					rn = rn.next_row;
 				}
 				checknowTable = 1;
 			}

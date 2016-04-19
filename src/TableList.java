@@ -229,6 +229,15 @@ public class TableList {
 		}
 	}
 	
+	public String[] getDataType(String name) {
+		table_node tn;
+		if((tn = this.checktablename(name)) != null) {
+			return tn.datatype;
+		} else {
+			return null;
+		}
+	}
+	
 	public boolean ifExistCol(String tablename,String colname){
 		String [] colnames = getColName(tablename);
 		for(String tmp : colnames){

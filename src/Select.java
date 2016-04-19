@@ -132,6 +132,8 @@ public class Select extends SQLRequest{
 		List<TableList.row_node> tn1_allRow = null;
 		String []table0colname = null;
 		String []table1colname = null;
+		String []table0datatype = null;
+		String []table1datatype = null;
 		List<Integer> indexoftargetcol_onetable = null;
 		List<List<Integer>> indexoftargetcol_twotable = null;
 		int lenofcondition = 0;
@@ -147,6 +149,7 @@ public class Select extends SQLRequest{
 				// 取出table的全部col
 				tn0_allRow = ct.return_colList(tablename0);
 				table0colname = ct.getColName(tablename0);
+				table0datatype = ct.getDataType(tablename0);
 				indexoftargetcol_onetable = new ArrayList<Integer>();
 				
 				// 把要拿出來的col 在原本table裡的位置存出來
@@ -174,17 +177,35 @@ public class Select extends SQLRequest{
 						switch(this.aggr) {
 							case 0:
 								for(TableList.row_node tmp_lr : tn0_allRow){
-									for(int a:indexoftargetcol_onetable){
+									for(int a : indexoftargetcol_onetable){
 										System.out.print(tmp_lr.data[a] + "  ");
 									}
 									System.out.print("\n");
 								}
 								break;
 							case 1:
-								count = tn0_allRow.size();
+								count = 0;
+								for(TableList.row_node tmp_lr : tn0_allRow) {
+									for(int a : indexoftargetcol_onetable) {
+										if(tmp_lr.data[a] != null)
+											count++;
+									}
+								}
 								System.out.println(count);
 								break;
 							case 2:
+								count = 0;
+								for(TableList.row_node tmp_lr : tn0_allRow) {
+									int i = 0;
+									for(int a : indexoftargetcol_onetable) {
+										int tmp = Integer.parseInt(tmp_lr.data[a]);
+										if(table0datatype[i].equals("int")) {
+											count += tmp;
+										}
+										i++;
+									}
+								}
+								System.out.println(count);
 								break;
 							default:
 						}
@@ -206,7 +227,7 @@ public class Select extends SQLRequest{
 						 			
 						 			targetindex1 = 0;
 						 			for(String t : table0colname){
-						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
+						 				if(t.equalsIgnoreCase(condition0.valueRight)){
 						 					break;
 						 				}else{
 						 					targetindex1++;
@@ -220,20 +241,23 @@ public class Select extends SQLRequest{
 													if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+													System.out.print("\n");
 											}
 					 						break;
 					 					case 3:
 					 						for(TableList.row_node tmp_lr : tn0_allRow){
 												for(int a:indexoftargetcol_onetable){
-													if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+													if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+													System.out.print("\n");
 											}
 					 						break;
 					 						
 						 			}
+						 			break;
 						 		case 1:
 						 			//右邊是字串
 						 			targetindex0 = 0;
@@ -253,7 +277,8 @@ public class Select extends SQLRequest{
 													if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
+													System.out.print("\n");
 											}
 						 					break;
 
@@ -264,7 +289,8 @@ public class Select extends SQLRequest{
 													if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
+													System.out.print("\n");
 											}
 						 					break;
 						 			}
@@ -291,7 +317,8 @@ public class Select extends SQLRequest{
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
 											}
 						 					break;
 						 				case 1:
@@ -302,7 +329,8 @@ public class Select extends SQLRequest{
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
 											}
 						 					break;
 						 				case 2:
@@ -313,27 +341,25 @@ public class Select extends SQLRequest{
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
 											}
 						 					break;
 						 				case 3:
 
 								 			for(TableList.row_node tmp_lr : tn0_allRow){
 												for(int a:indexoftargetcol_onetable){
-													
 													if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
 														System.out.print(tmp_lr.data[a] + "  ");
 												}
-												System.out.print("\n");
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
 											}
 						 					break;
 						 			}
 					 				break;
 						 }
-						 	
-						 
-						 
-						
+						 						
 						//one condition
 						break;
 					case 2:
@@ -483,7 +509,7 @@ public class Select extends SQLRequest{
 			cs.typeLeft = 2;
 			cs.valueLeft = left;
 		} catch (NumberFormatException e) {
-			if(left.startsWith("'") && left.endsWith("'")) {
+			if(left.startsWith("\\'") && left.endsWith("\\'")) {
 				cs.typeLeft = 1;
 				cs.valueLeft = left.substring(1, left.length()-1);
 			} else {
@@ -509,29 +535,29 @@ public class Select extends SQLRequest{
 		// Right
 		try {
 			Integer.parseInt(right);
-			cs.typeLeft = 2;
-			cs.valueLeft = right;
+			cs.typeRight = 2;
+			cs.valueRight = right;
 		} catch (NumberFormatException e) {
-			if(left.startsWith("'") && right.endsWith("'")) {
-				cs.typeLeft = 1;
-				cs.valueLeft = right.substring(1, right.length()-1);
+			if(right.startsWith("\'") && right.endsWith("\'")) {
+				cs.typeRight = 1;
+				cs.valueRight = right.substring(1, right.length()-1);
 			} else {
-				cs.typeLeft = 0;
+				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = t;
-					String col = tmp_c[1];
+					String col = tmp_c[0];
 					checkCol(table, col);
-					cs.tableLeft = table;
-					cs.valueLeft = col;
+					cs.tableRight = table;
+					cs.valueRight = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
 					checkCol(table, col);
-					cs.tableLeft = table;
-					cs.valueLeft = col;
+					cs.tableRight = table;
+					cs.valueRight = col;
 				}			
 			}
 		}
@@ -542,20 +568,14 @@ public class Select extends SQLRequest{
 		
 		if(!col.equals("*")){
 			String useToSetNonTableNameCol = null;
-			boolean conflict = true;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){
 					useToSetNonTableNameCol = tmp_input_table_name.get(0);
-					conflict &= true;
 				} else {
-					conflict &= false;
+					throw new Exception("Table not found.");
 				}
 			}
-			if(conflict) {
-				throw new Exception("Column name conflicts.");
-			} else {
-				table = useToSetNonTableNameCol;
-			}
+			table = useToSetNonTableNameCol;
 		} else if(!Main.ct.ifExistCol(table,col)) {
 			throw new Exception("Column name not found.");
 		}

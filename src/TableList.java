@@ -239,7 +239,7 @@ public class TableList {
 		return false;
 	}
 	
-	public boolean checkColInTable(List<List<String>> input_table_name,List<List<String>> input_colname){
+	public boolean checkColInTable(List<List<String>> input_table_name,List<List<String>> input_colname) throws Exception{
 		
 		// 判斷是否都存在其table
 		
@@ -259,33 +259,28 @@ public class TableList {
 				int count = 0;
 				int site = 0;
 				String useToSetNonTableNameCol = null;
+				boolean conflict = true;
 				for(List<String> tmp_input_table_name : input_table_name){
 					if(ifExistCol(tmp_input_table_name.get(0),colname) == true){
 						site = count;
 						useToSetNonTableNameCol = tmp_input_table_name.get(0);
-						count++;
-						
-					}else{
-						System.out.println("沒有table存在此col");
-						return false;
+						conflict &= true;
+					} else {
+						conflict &= false;
 					}
-					
-					if(count ==2){
-						System.out.println("conflict了～～～");
-						return false;
-					}
+				}
+				if(conflict) {
+					throw new Exception("Column name conflicts.");
 				}
 				a.set(site, useToSetNonTableNameCol);
 				
-				
-			}
-			
-			// 拿到a_node 的 col   
-			else{
-				if(!ifExistCol(tablename,colname)){
-					System.out.println("沒這col name");
+			} else {
+				// 拿到a_node 的 col   
+
+				if(!ifExistCol(tablename,colname)) {
+					System.out.println("Column name not found.");
 					return false;
-				};
+				}
 			}
 			
 			

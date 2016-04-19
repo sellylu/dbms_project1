@@ -148,6 +148,8 @@ public class Select extends SQLRequest{
 		List<Integer> tmpLI;
 		List<Integer> checkList0;
 		List<Integer> checkList1;
+		List<List<Integer>> checkList_twoT0;
+		List<List<Integer>> checkList_twoT1;
 		int doit;
 		switch(table_count){
 			
@@ -855,6 +857,7 @@ public class Select extends SQLRequest{
 						
 						break;
 					case 1:
+						//one condition
 						condition0 = this.condition.get(0);
 						switch(condition0.typeRight){
 							case 0:
@@ -1531,28 +1534,756 @@ public class Select extends SQLRequest{
 					 			}
 				 				break;
 				 			}
-						//one condition
-						break;
-					case 2:
-						// two condition
 						
 						break;
+						
+						// end of case 1
+						
+					case 2:
+						// two condition
+						doit =0;
+						checkList0 = new ArrayList<Integer>();
+						checkList1= new ArrayList<Integer>();
+						
+						condition0 = this.condition.get(0);
+						condition1 = this.condition.get(1);
+						
+						switch(condition0.typeRight){
+							case 0:
+								targetindex0 = 0;
+								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}
+								
+								targetindex1 = 0;
+								if(condition0.valueRight.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueRight)){
+											break;
+						 				}else{
+						 					targetindex1++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueRight)){
+											break;
+						 				}else{
+						 					targetindex1++;
+						 				}
+									}
+								}
+							
+								switch(condition0.operator){
+									case 0:
+										switch(this.aggr) {
+											case 0:
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
+																	doit =1;
+																	
+																}
+															}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																	doit =1;
+																	
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																if(!tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){                   
+																	doit =1;
+																}
+															}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																if(!tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																	doit =1;
+																}
+															}
+															
+														}
+														
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+													
+												
+												break;
+											
+							 			case 3:
+							 				switch(this.aggr) {
+								 				case 0:
+								 					for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+																if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																	if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
+																		doit =1;
+																	}
+																}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																	if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																		doit =1;
+																	}
+																}
+															}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+																if(condition0.tableRight.equalsIgnoreCase(tablename0)){
+																	if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){                   
+																		doit =1;
+																	}
+																}else if(condition0.tableRight.equalsIgnoreCase(tablename1)){
+																	if(tmp_lr2.data[targetindex0].equalsIgnoreCase(tmp_lr2.data[targetindex1])){
+																		doit =1;
+																	}
+																}
+																
+															}
+															if(doit ==1){
+																checkList0.add(1);
+																doit=0;
+															}else{
+																checkList0.add(0);
+															}
+														}
+													}
+						 						break;
+							 				
+							 				}
+							 				break;
+					 			}
+								break;
+							case 1:
+						 		//右邊是字串
+								targetindex0 = 0;
+								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}
+								
+								
+						 		
+						 		switch(condition0.operator){
+						 			case 0:
+						 				switch(this.aggr) {
+						 					case 0:
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
+																doit=1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(!tmp_lr2.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){                   
+																doit =1;
+															}
+														}
+														if(doit == 1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+								 				break;
+						 					
+						 				}
+						 				break;
+						 			case 3:
+						 				switch(this.aggr) {
+						 					case 0:
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
+																doit =1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(tmp_lr2.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){                   
+																doit =1;
+															}
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+						 						break;
+						 					
+						 				}
+						 				break;
+						 		}
+					 			break;
+						 	case 2:
+								// 右邊是數字
+					 			// 取得左邊在第幾個位置
+					 			
+						 		targetindex0 = 0;
+								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}
+						 			
+					 			switch(condition0.operator){
+						 			case 0:
+						 				switch(this.aggr) {
+						 					case 0:
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight)){
+																doit =1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) != Integer.parseInt(condition0.valueRight)){                   
+																doit =1;
+															}
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+						 						break;
+						 					
+						 				}
+						 				break;
+									case 1:
+										switch(this.aggr) {
+											case 0:
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight)){
+																doit=1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) < Integer.parseInt(condition0.valueRight)){                   
+																doit=1;
+															}
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+												break;
+										}
+						 				break;
+									case 2:
+										switch(this.aggr) {
+											case 0:
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight)){
+																doit =1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) > Integer.parseInt(condition0.valueRight)){                   
+																doit =1;
+															}
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+												break;
+											
+										}
+						 				break;
+									case 3:
+										switch(this.aggr) {
+											case 0:
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight)){
+																doit =1;
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) == Integer.parseInt(condition0.valueRight)){                   
+																doit =1;
+															}
+														}
+														if(doit ==1){
+															checkList0.add(1);
+															doit=0;
+														}else{
+															checkList0.add(0);
+														}
+													}
+												}
+												break;
+										}
+										break;
+					 			}
+				 				break;
+				 		}
+								
+								switch(condition1.typeRight){
+								case 0:
+									targetindex2 = 0;
+									if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+										for(String t : table0colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}else{
+										for(String t : table1colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}
+									
+									targetindex3 = 0;
+									if(condition1.valueRight.equalsIgnoreCase(tablename0)){
+										for(String t : table0colname){
+											if(t.equalsIgnoreCase(condition1.valueRight)){
+												break;
+							 				}else{
+							 					targetindex3++;
+							 				}
+										}
+									}else{
+										for(String t : table1colname){
+											if(t.equalsIgnoreCase(condition1.valueRight)){
+												break;
+							 				}else{
+							 					targetindex3++;
+							 				}
+										}
+									}
+								
+									switch(condition1.operator){
+										case 0:
+											switch(this.aggr) {
+												case 0:
+													for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(condition1.tableRight.equalsIgnoreCase(tablename0)){
+																	if(!tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){
+																		doit =1;
+																		
+																	}
+																}else if(condition1.tableRight.equalsIgnoreCase(tablename1)){
+																	if(!tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr2.data[targetindex3])){
+																		doit =1;
+																		
+																	}
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																if(condition1.tableRight.equalsIgnoreCase(tablename0)){
+																	if(!tmp_lr2.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){                   
+																		doit =1;
+																	}
+																}else if(condition1.tableRight.equalsIgnoreCase(tablename1)){
+																	if(!tmp_lr2.data[targetindex2].equalsIgnoreCase(tmp_lr2.data[targetindex3])){
+																		doit =1;
+																	}
+																}
+																
+															}
+															
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+														
+													
+													break;
+												
+								 			case 3:
+								 				switch(this.aggr) {
+									 				case 0:
+									 					for(TableList.row_node tmp_lr : tn0_allRow){
+															for(TableList.row_node tmp_lr2 : tn1_allRow){
+																if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																	if(condition1.tableRight.equalsIgnoreCase(tablename0)){
+																		if(tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){
+																			doit =1;
+																		}
+																	}else if(condition1.tableRight.equalsIgnoreCase(tablename1)){
+																		if(tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr2.data[targetindex3])){
+																			doit =1;
+																		}
+																	}
+																}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																	if(condition1.tableRight.equalsIgnoreCase(tablename0)){
+																		if(tmp_lr2.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){                   
+																			doit =1;
+																		}
+																	}else if(condition1.tableRight.equalsIgnoreCase(tablename1)){
+																		if(tmp_lr2.data[targetindex2].equalsIgnoreCase(tmp_lr2.data[targetindex3])){
+																			doit =1;
+																		}
+																	}
+																	
+																}
+																if(doit ==1){
+																	checkList1.add(1);
+																	doit=0;
+																}else{
+																	checkList1.add(0);
+																}
+															}
+														}
+							 						break;
+								 				
+								 				}
+								 				break;
+						 			}
+									break;
+								case 1:
+							 		//右邊是字串
+									targetindex2 = 0;
+									if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+										for(String t : table0colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}else{
+										for(String t : table1colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}
+									
+									
+							 		
+							 		switch(condition1.operator){
+							 			case 0:
+							 				switch(this.aggr) {
+							 					case 0:
+							 						for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(!tmp_lr.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){
+																	doit=1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(!tmp_lr2.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){                   
+																	doit =1;
+																}
+															}
+															if(doit == 1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+									 				break;
+							 					
+							 				}
+							 				break;
+							 			case 3:
+							 				switch(this.aggr) {
+							 					case 0:
+							 						for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(tmp_lr.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){
+																	doit =1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(tmp_lr2.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){                   
+																	doit =1;
+																}
+															}
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+							 						break;
+							 					
+							 				}
+							 				break;
+							 		}
+						 			break;
+							 	case 2:
+									// 右邊是數字
+						 			// 取得左邊在第幾個位置
+						 			
+							 		targetindex2 = 0;
+									if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+										for(String t : table0colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}else{
+										for(String t : table1colname){
+											if(t.equalsIgnoreCase(condition1.valueLeft)){
+												break;
+							 				}else{
+							 					targetindex2++;
+							 				}
+										}
+									}
+							 			
+						 			switch(condition1.operator){
+							 			case 0:
+							 				switch(this.aggr) {
+							 					case 0:
+							 						for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(Integer.parseInt(tmp_lr.data[targetindex2]) != Integer.parseInt(condition1.valueRight)){
+																	doit =1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(Integer.parseInt(tmp_lr2.data[targetindex2]) != Integer.parseInt(condition1.valueRight)){                   
+																	doit =1;
+																}
+															}
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+							 						break;
+							 					
+							 				}
+							 				break;
+										case 1:
+											switch(this.aggr) {
+												case 0:
+													for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(Integer.parseInt(tmp_lr.data[targetindex2]) < Integer.parseInt(condition1.valueRight)){
+																	doit=1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(Integer.parseInt(tmp_lr2.data[targetindex2]) < Integer.parseInt(condition1.valueRight)){                   
+																	doit=1;
+																}
+															}
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+													break;
+											}
+							 				break;
+										case 2:
+											switch(this.aggr) {
+												case 0:
+													for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(Integer.parseInt(tmp_lr.data[targetindex2]) > Integer.parseInt(condition1.valueRight)){
+																	doit =1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(Integer.parseInt(tmp_lr2.data[targetindex2]) > Integer.parseInt(condition1.valueRight)){                   
+																	doit =1;
+																}
+															}
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+													break;
+												
+											}
+							 				break;
+										case 3:
+											switch(this.aggr) {
+												case 0:
+													for(TableList.row_node tmp_lr : tn0_allRow){
+														for(TableList.row_node tmp_lr2 : tn1_allRow){
+															if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
+																if(Integer.parseInt(tmp_lr.data[targetindex2]) == Integer.parseInt(condition1.valueRight)){
+																	doit =1;
+																}
+															}else if(condition1.tableLeft.equalsIgnoreCase(tablename1)){
+																
+																if(Integer.parseInt(tmp_lr2.data[targetindex2]) == Integer.parseInt(condition1.valueRight)){                   
+																	doit =1;
+																}
+															}
+															if(doit ==1){
+																checkList1.add(1);
+																doit=0;
+															}else{
+																checkList1.add(0);
+															}
+														}
+													}
+													break;
+											}
+											break;
+						 			}
+					 				break;
+									}
+								}
+								
+								switch(this.op){
+								case 1:
+									int c =0;
+									for(TableList.row_node tmp_lr : tn0_allRow){
+										for(TableList.row_node tmp_lr2 : tn1_allRow){
+											if(checkList0.get(c) + checkList1.get(c) >0){
+												for(List<Integer> a:indexoftargetcol_twotable){
+													int t = a.get(1); // 哪個table
+													if(t==0){
+														System.out.print(tmp_lr.data[a.get(0)] + "  ");
+													}else if(t==1){
+														System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+														
+													}
+												}
+											}
+											c++;
+										}
+									
+											
+									}
+									
+									break;
+								case 2:
+									int d =0;
+									for(TableList.row_node tmp_lr : tn0_allRow){
+										for(TableList.row_node tmp_lr2 : tn1_allRow){
+											if(checkList0.get(d) + checkList1.get(d) >0){
+												for(List<Integer> a:indexoftargetcol_twotable){
+													int t = a.get(1); // 哪個table
+													if(t==0){
+														System.out.print(tmp_lr.data[a.get(0)] + "  ");
+													}else if(t==1){
+														System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+														
+													}
+												}
+											}
+											d++;
+										}
+									
+											
+									}
+									break;
+							}
+								
+							
+						
+						// end of two condition
+						break;
+						}
 					default:
 						System.out.println("wrong");
 						break;
-				}
-					
-				
+					}
 				break;
 			default:
 				break;
 		}
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void constructTable(String[] where) throws Exception {

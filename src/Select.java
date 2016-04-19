@@ -1563,25 +1563,59 @@ public class Select extends SQLRequest{
 							case 1:
 						 		//右邊是字串
 								targetindex0 = 0;
-								for(String t : table0colname){
-									if(t.equalsIgnoreCase(condition0.valueLeft)){
-										break;
-						 			}else{
-						 				targetindex0++;
-						 			}
-						 		}
+								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}
+								
+								
 						 		
 						 		switch(condition0.operator){
 						 			case 0:
 						 				switch(this.aggr) {
 						 					case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-										 			for(int a:indexoftargetcol_onetable){
-										 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))
-										 					System.out.print(tmp_lr.data[a] + "  ");
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(!tmp_lr2.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))
-														System.out.print("\n");
 												}
 								 				break;
 						 					case 1:
@@ -1615,13 +1649,35 @@ public class Select extends SQLRequest{
 						 			case 3:
 						 				switch(this.aggr) {
 						 					case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-													for(int a:indexoftargetcol_onetable){
-														if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))      
-															System.out.print(tmp_lr.data[a] + "  ");
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(tmp_lr2.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight))      
-														System.out.print("\n");
 												}
 						 						break;
 						 					case 1:
@@ -1658,26 +1714,58 @@ public class Select extends SQLRequest{
 								// 右邊是數字
 					 			// 取得左邊在第幾個位置
 					 			
-					 			targetindex0 = 0;
-					 			for(String t : table0colname){
-						 			if(t.equalsIgnoreCase(condition0.valueLeft)){
-						 				break;
-									}else{
-					 					targetindex0++;
-					 				}
-					 			}
+						 		targetindex0 = 0;
+								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+									for(String t : table0colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}else{
+									for(String t : table1colname){
+										if(t.equalsIgnoreCase(condition0.valueLeft)){
+											break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+									}
+								}
 						 			
 					 			switch(condition0.operator){
 						 			case 0:
 						 				switch(this.aggr) {
 						 					case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-													for(int a:indexoftargetcol_onetable){				
-														if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
-															System.out.print(tmp_lr.data[a] + "  ");
+						 						for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) != Integer.parseInt(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
-														System.out.print("\n");
 												}
 						 						break;
 						 					case 1:
@@ -1710,13 +1798,35 @@ public class Select extends SQLRequest{
 									case 1:
 										switch(this.aggr) {
 											case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-													for(int a:indexoftargetcol_onetable){
-														if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
-															System.out.print(tmp_lr.data[a] + "  ");
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) < Integer.parseInt(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
-														System.out.print("\n");
 												}
 												break;
 											case 1:
@@ -1749,13 +1859,35 @@ public class Select extends SQLRequest{
 									case 2:
 										switch(this.aggr) {
 											case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-													for(int a:indexoftargetcol_onetable){
-														if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
-															System.out.print(tmp_lr.data[a] + "  ");
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) > Integer.parseInt(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
-														System.out.print("\n");
 												}
 												break;
 											case 1:
@@ -1788,13 +1920,35 @@ public class Select extends SQLRequest{
 									case 3:
 										switch(this.aggr) {
 											case 0:
-										 		for(TableList.row_node tmp_lr : tn0_allRow){
-													for(int a:indexoftargetcol_onetable){
-														if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
-															System.out.print(tmp_lr.data[a] + "  ");
+												for(TableList.row_node tmp_lr : tn0_allRow){
+													for(TableList.row_node tmp_lr2 : tn1_allRow){
+														if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
+															if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight)){
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}else if(condition0.tableLeft.equalsIgnoreCase(tablename1)){
+															
+															if(Integer.parseInt(tmp_lr2.data[targetindex0]) == Integer.parseInt(condition0.valueRight)){                   
+																for(List<Integer> a:indexoftargetcol_twotable){
+																	int t = a.get(1); // 哪個table
+																	if(t==0){
+																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																	}else if(t==1){
+																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		
+																	}
+																}
+															}
+														}
 													}
-													if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
-														System.out.print("\n");
 												}
 												break;
 											case 1:
@@ -1943,7 +2097,6 @@ public class Select extends SQLRequest{
 	
 	
 	private void checkCol(String table, String col) throws Exception {
-		
 
 		if(!col.equals("*") && table == null) {
 			String useToSetNonTableNameCol = null;

@@ -122,7 +122,6 @@ public class Select extends SQLRequest{
 	
 	public void doSelectFunction(TableList ct){
 		
-		//where a.name = "sss";
 		ConditionStruct tmp0 = null;
 		ConditionStruct tmp1 = null;
 		ConditionStruct tmp2 = null;
@@ -131,25 +130,34 @@ public class Select extends SQLRequest{
 		
 		int table_count = this.tableName.size();
 		String tablename0,tablename1 = null;
+		List<TableList.row_node> tn0_allRow = null;
+		List<TableList.row_node> tn1_allRow = null;
+		String []table0colname = null;
+		String []table1colname = null;
+		List<Integer> indexoftargetcol_onetable = null;
+		List<List<Integer>> indexoftargetcol_twotable = null;
+		int lenofcondition = 0;
+		int tmpc =0;
+		List<Integer> tmpLI;
 		switch(table_count){
 			
 			case 1:
 				tablename0 = this.tableName.get(0).get(0);
 				// 取出table的全部col
-				List<TableList.row_node> tn0_allRow = ct.return_colList(tablename0);
-				String []tablecolname = ct.getColName(tablename0);
-				List<Integer> indexoftargetcol = new ArrayList<Integer>();
+				tn0_allRow = ct.return_colList(tablename0);
+				table0colname = ct.getColName(tablename0);
+				indexoftargetcol_onetable = new ArrayList<Integer>();
 				
 				
 				// 把要拿出來的col 在原本table裡的位置存出來
 				for(List<String> targetcol: this.colName){
 					String col = targetcol.get(1);
-					int tmpc = 0;
-					for(String c : tablecolname){
+					tmpc = 0;
+					for(String c : table0colname){
 						if(col.equals("*")) {
-							indexoftargetcol.add(tmpc);
-						} else if(col.equalsIgnoreCase(c)){
-							indexoftargetcol.add(tmpc);
+							indexoftargetcol_onetable.add(tmpc);
+						} else if(col.equalsIgnoreCase(c)) {
+							indexoftargetcol_onetable.add(tmpc);
 							tmpc = 0;
 							break;
 						}
@@ -159,14 +167,14 @@ public class Select extends SQLRequest{
 				
 				
 				//得到condition
-				int lenofcondition = this.condition.size();
+				lenofcondition = this.condition.size();
 				switch(lenofcondition){
 					case 0:
 						// 沒有 where
 						//select name,apple
 						//from table
 						for(TableList.row_node tmp_lr : tn0_allRow){
-							for(int a:indexoftargetcol){
+							for(int a:indexoftargetcol_onetable){
 								System.out.print(tmp_lr.data[a] + "  ");
 							}
 							System.out.print("\n");
@@ -187,13 +195,96 @@ public class Select extends SQLRequest{
 						System.out.println("wrong");
 						break;
 				}
-
-				
-				
 				break;
 			case 2:
 				tablename0 = this.tableName.get(0).get(0);
 				tablename1 = this.tableName.get(1).get(0);
+				
+				// 取出table的全部col
+				tn0_allRow = ct.return_colList(tablename0);
+				tn1_allRow = ct.return_colList(tablename1);
+				table0colname = ct.getColName(tablename0);
+				table1colname = ct.getColName(tablename1);
+				indexoftargetcol_twotable= new ArrayList<List<Integer>>();
+				
+				for(List<String> targetcol : this.colName){
+					tmpc = 0;
+					if(targetcol.get(0).equals(tablename0)){
+						for(String c : table0colname){
+							
+							if(targetcol.get(1).equalsIgnoreCase(c)){
+								
+								tmpLI = new ArrayList<Integer>();
+								tmpLI.add(tmpc);
+								tmpLI.add(0);
+								indexoftargetcol_twotable.add(tmpLI);
+								tmpc = 0;
+								break;
+							}else{
+								tmpc++;
+							}
+						}
+					}else if(targetcol.get(0).equals(tablename1)){
+						for(String c : table1colname){
+							
+							if(targetcol.get(1).equalsIgnoreCase(c)){
+								
+								tmpLI = new ArrayList<Integer>();
+								tmpLI.add(tmpc);
+								tmpLI.add(1);
+								indexoftargetcol_twotable.add(tmpLI);
+								tmpc = 0;
+								break;
+							}else{
+								tmpc++;
+							}
+						}
+					}
+				}
+				
+				lenofcondition = this.condition.size();
+				switch(lenofcondition){
+					case 0:
+						// 沒有 where
+						//select name,apple
+						//from table1 table2
+						for(TableList.row_node tmp_lr0 : tn0_allRow){
+							for(TableList.row_node tmp_lr1 : tn1_allRow){
+								
+								for(List<Integer> a:indexoftargetcol_twotable){
+									int t = a.get(1); // 哪個table
+									if(t==0){
+										System.out.print(tmp_lr0.data[a.get(0)] + "  ");
+									}else if(t==1){
+										System.out.print(tmp_lr1.data[a.get(0)] + "  ");
+										
+									}
+								}System.out.print("\n");
+								
+							}
+							
+							
+							//condition 是否成立
+							
+						}
+						break;
+					case 2:
+						
+						//one condition
+						break;
+					case 4:
+						// two condition
+						
+						break;
+					default:
+						System.out.println("wrong");
+						break;
+				}
+				
+				
+				
+				
+				
 				break;
 			default:
 				break;

@@ -145,8 +145,6 @@ public class Select extends SQLRequest{
 		List<Integer> tmpLI;
 		List<Integer> checkList0;
 		List<Integer> checkList1;
-		List<List<Integer>> checkList_twoT0;
-		List<List<Integer>> checkList_twoT1;
 		int doit;
 		switch(table_count){
 			
@@ -2312,10 +2310,17 @@ public class Select extends SQLRequest{
 						// end of case 1
 						
 					case 2:
+					
+						// 取出table的全部col
+						tn0_allRow = ct.return_colList(tablename0);
+						tn1_allRow = ct.return_colList(tablename1);
+						table0colname = ct.getColName(tablename0);
+						table1colname = ct.getColName(tablename1);
+						indexoftargetcol_twotable= new ArrayList<List<Integer>>();
 						// two condition
 						doit =0;
 						checkList0 = new ArrayList<Integer>();
-						checkList1= new ArrayList<Integer>();
+						checkList1 = new ArrayList<Integer>();
 						
 						condition0 = this.condition.get(0);
 						condition1 = this.condition.get(1);

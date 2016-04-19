@@ -315,4 +315,23 @@ public class TableList {
 			
 		
 	}
+	
+	public String getDataType(String name,String name2){
+		table_node tn;
+		if((tn = this.checktablename(name)) != null) {
+			int c =0;
+			for(String col : tn.colname){
+				if(col.equalsIgnoreCase(name2)){
+					return tn.datatype[c];
+				}
+				else{
+					c++;
+				}
+			}
+		} else {
+			return null;
+		}
+		return null;
+	}
+	
 }

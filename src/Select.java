@@ -2171,7 +2171,7 @@ public class Select extends SQLRequest{
 									int c =0;
 									for(TableList.row_node tmp_lr : tn0_allRow){
 										for(TableList.row_node tmp_lr2 : tn1_allRow){
-											if(checkList0.get(c) + checkList1.get(c) >0){
+											if(checkList0.get(c) + checkList1.get(c) == 2){
 												for(List<Integer> a:indexoftargetcol_twotable){
 													int t = a.get(1); // 哪個table
 													if(t==0){
@@ -2276,13 +2276,13 @@ public class Select extends SQLRequest{
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = null;
 					String col = tmp_c[0];
-					checkCol(table, col);
+					cs.dataLeft = checkCol(table, col);
 					cs.tableLeft = table;
 					cs.valueLeft = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
-					checkCol(table, col);
+					cs.dataLeft = checkCol(table, col);
 					cs.tableLeft = table;
 					cs.valueLeft = col;
 				}
@@ -2305,27 +2305,36 @@ public class Select extends SQLRequest{
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = t;
 					String col = tmp_c[0];
-					checkCol(table, col);
+					cs.dataRight = checkCol(table, col);
 					cs.tableRight = table;
 					cs.valueRight = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
-					checkCol(table, col);
+					cs.dataRight = checkCol(table, col);
 					cs.tableRight = table;
 					cs.valueRight = col;
 				}			
 			}
 		}
+		
+		if(cs.dataLeft == null || cs.dataRight == null) {
+			throw new Exception("Dayatype not match");
+		} else if(!cs.dataLeft.equalsIgnoreCase(cs.dataRight)) {
+			throw new Exception("Dayatype not match");
+		}
+		
+
 	}
 	
 	
-	private void checkCol(String table, String col) throws Exception {
-
+	private String checkCol(String table, String col) throws Exception {
+		String datatype = null;
 		if(!col.equals("*") && table == null) {
 			String useToSetNonTableNameCol = null;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){
+					datatype = Main.ct.getDataType(tmp_input_table_name.get(0), col);
 					useToSetNonTableNameCol = tmp_input_table_name.get(0);
 				} else {
 					throw new Exception("Table not found.");
@@ -2335,7 +2344,7 @@ public class Select extends SQLRequest{
 		} else if(!Main.ct.ifExistCol(table,col)) {
 			throw new Exception("Column name not found.");
 		}
-
+		return datatype;
 	}
 	
 	private int checkAggr(String le, String ri, String a, String type, int count, int op, int num) {
@@ -2369,6 +2378,8 @@ public class Select extends SQLRequest{
 	}
 	
 	class ConditionStruct{
+		String dataLeft;
+		String dataRight; 
 		String tableLeft = null;
 		String tableRight = null;
 		String valueLeft;

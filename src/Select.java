@@ -138,6 +138,7 @@ public class Select extends SQLRequest{
 		List<List<Integer>> indexoftargetcol_twotable = null;
 		int lenofcondition = 0;
 		int tmpc =0;
+		int count = 0;
 		List<Integer> tmpLI;
 		switch(table_count){
 			
@@ -170,15 +171,25 @@ public class Select extends SQLRequest{
 						// 沒有 where
 						//select name,apple
 						//from table
-						for(TableList.row_node tmp_lr : tn0_allRow){
-							for(int a:indexoftargetcol_onetable){
-								System.out.print(tmp_lr.data[a] + "  ");
-							}
-							System.out.print("\n");
-							
-							//condition 是否成立
-							
+						switch(this.aggr) {
+							case 0:
+								for(TableList.row_node tmp_lr : tn0_allRow){
+									for(int a:indexoftargetcol_onetable){
+										System.out.print(tmp_lr.data[a] + "  ");
+									}
+									System.out.print("\n");
+								}
+								break;
+							case 1:
+								count = tn0_allRow.size();
+								System.out.println(count);
+								break;
+							case 2:
+								break;
+							default:
 						}
+						
+
 						break;
 					case 2:
 						
@@ -222,7 +233,7 @@ public class Select extends SQLRequest{
 					} else if(targetcol.get(0).equals(tablename1)){
 						for(String c : table1colname){
 							String col = targetcol.get(1);
-							if(col.equals("*")) {
+							if(col.equals("*") || col.equalsIgnoreCase(c)) {
 								tmpLI = new ArrayList<Integer>();
 								tmpLI.add(tmpc);
 								tmpLI.add(1);
@@ -241,24 +252,33 @@ public class Select extends SQLRequest{
 						// 沒有 where
 						//select name,apple
 						//from table1 table2
-						for(TableList.row_node tmp_lr0 : tn0_allRow){
-							for(TableList.row_node tmp_lr1 : tn1_allRow){
-								
-								for(List<Integer> a:indexoftargetcol_twotable){
-									int t = a.get(1); // 哪個table
-									if(t==0){
-										System.out.print(tmp_lr0.data[a.get(0)] + "  ");
-									}else if(t==1){
-										System.out.print(tmp_lr1.data[a.get(0)] + "  ");
-										
+						
+						switch(this.aggr) {
+						case 0:
+							for(TableList.row_node tmp_lr0 : tn0_allRow){
+								for(TableList.row_node tmp_lr1 : tn1_allRow){
+									for(List<Integer> a:indexoftargetcol_twotable){
+										int t = a.get(1); // 哪個table
+										if(t==0){
+											System.out.print(tmp_lr0.data[a.get(0)] + "  ");
+										}else if(t==1){
+											System.out.print(tmp_lr1.data[a.get(0)] + "  ");
+											
+										}
 									}
-								}System.out.print("\n");
-								
+									System.out.print("\n");
+								}
 							}
-							
-							//condition 是否成立
-							
-						}
+							break;
+						case 1:
+							count = tn0_allRow.size() * tn1_allRow.size();
+							System.out.println(count);
+							break;
+						case 2:
+							break;
+						default:
+					}
+						
 						break;
 					case 2:
 						
@@ -315,7 +335,7 @@ public class Select extends SQLRequest{
 		return null;
 	}
 	
-	private void parseExpression(String left, String right, ConditionStruct cs) {
+	private void parseExpression(String left, String right, ConditionStruct cs) throws Exception {
 		// Left
 		try {
 			Integer.parseInt(left);
@@ -331,9 +351,17 @@ public class Select extends SQLRequest{
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					cs.valueLeft = tmp_c[0];
+					String table = null;
+					String col = tmp_c[0];
+					checkCol(table, col);
+					cs.tableLeft = table;
+					cs.valueLeft = col;
 				} else if(t != null) {	// Table.col or t.col
-					cs.valueLeft = t.concat("." + tmp_c[1]);
+					String table = t;
+					String col = tmp_c[1];
+					checkCol(table, col);
+					cs.tableLeft = table;
+					cs.valueLeft = col;
 				}
 			}
 		}
@@ -352,15 +380,50 @@ public class Select extends SQLRequest{
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					cs.valueLeft = tmp_c[0];
+					String table = t;
+					String col = tmp_c[1];
+					checkCol(table, col);
+					cs.tableLeft = table;
+					cs.valueLeft = col;
 				} else if(t != null) {	// Table.col or t.col
-					cs.valueLeft = t.concat("." + tmp_c[1]);
+					String table = t;
+					String col = tmp_c[1];
+					checkCol(table, col);
+					cs.tableLeft = table;
+					cs.valueLeft = col;
 				}			
 			}
 		}
 	}
 	
+	
+	private void checkCol(String table, String col) throws Exception {
+		
+		if(!col.equals("*")){
+			String useToSetNonTableNameCol = null;
+			boolean conflict = true;
+			for(List<String> tmp_input_table_name : this.tableName){
+				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){
+					useToSetNonTableNameCol = tmp_input_table_name.get(0);
+					conflict &= true;
+				} else {
+					conflict &= false;
+				}
+			}
+			if(conflict) {
+				throw new Exception("Column name conflicts.");
+			} else {
+				table = useToSetNonTableNameCol;
+			}
+		} else if(!Main.ct.ifExistCol(table,col)) {
+			throw new Exception("Column name not found.");
+		}
+
+	}
+	
 	class ConditionStruct{
+		String tableLeft = null;
+		String tableRight = null;
 		String valueLeft;
 		String valueRight;
 		int typeLeft;  // 0:table.col  , 1: String 2: Int

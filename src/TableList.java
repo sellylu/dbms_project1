@@ -251,28 +251,23 @@ public class TableList {
 			String tablename = a.get(0);
 			String colname = a.get(1);
 			
-			
 			if(colname.equals("*")) continue;
 			
-			
 			if(tablename == null){
-				int count = 0;
-				int site = 0;
 				String useToSetNonTableNameCol = null;
 				boolean conflict = true;
 				for(List<String> tmp_input_table_name : input_table_name){
 					if(ifExistCol(tmp_input_table_name.get(0),colname) == true){
-						site = count;
 						useToSetNonTableNameCol = tmp_input_table_name.get(0);
 						conflict &= true;
 					} else {
 						conflict &= false;
 					}
 				}
-				if(conflict) {
+				if(conflict && input_table_name.size() > 1) {
 					throw new Exception("Column name conflicts.");
 				}
-				a.set(site, useToSetNonTableNameCol);
+				a.set(0, useToSetNonTableNameCol);
 				
 			} else {
 				// 拿到a_node 的 col   
@@ -302,6 +297,7 @@ public class TableList {
 					colList.add(rn);
 					rn = rn.next_row;
 				}
+				colList.add(rn);
 				checknowTable = 1;
 			}
 			tn = tn.next_table;

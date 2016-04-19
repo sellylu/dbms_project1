@@ -122,10 +122,8 @@ public class Select extends SQLRequest{
 	
 	public void doSelectFunction(TableList ct){
 		
-		ConditionStruct tmp0 = null;
-		ConditionStruct tmp1 = null;
-		ConditionStruct tmp2 = null;
-		ConditionStruct tmp3 = null;
+		ConditionStruct condition0 = null;
+		ConditionStruct condition1 = null;
 		// 判斷 From 多少table
 		
 		int table_count = this.tableName.size();
@@ -141,6 +139,8 @@ public class Select extends SQLRequest{
 		int lenofcondition = 0;
 		int tmpc =0;
 		int count = 0;
+		int targetindex0=0;
+		int targetindex1=0;
 		List<Integer> tmpLI;
 		switch(table_count){
 			
@@ -213,7 +213,153 @@ public class Select extends SQLRequest{
 
 						break;
 					case 1:
-						
+						 condition0 = this.condition.get(0);
+						 switch(condition0.typeRight){
+						 		case 0:
+						 			targetindex0 = 0;
+						 			for(String t : table0colname){
+						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
+						 					break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+						 			}
+						 			
+						 			targetindex1 = 0;
+						 			for(String t : table0colname){
+						 				if(t.equalsIgnoreCase(condition0.valueRight)){
+						 					break;
+						 				}else{
+						 					targetindex1++;
+						 				}
+						 			}
+						 			
+						 			switch(condition0.operator){
+					 					case 0:
+					 						for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(!tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+													System.out.print("\n");
+											}
+					 						break;
+					 					case 3:
+					 						for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(tmp_lr.data[targetindex0].equals(tmp_lr.data[targetindex1]))
+													System.out.print("\n");
+											}
+					 						break;
+					 						
+						 			}
+						 			break;
+						 		case 1:
+						 			//右邊是字串
+						 			targetindex0 = 0;
+						 			for(String t : table0colname){
+						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
+						 					break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+						 			}
+						 			
+						 			switch(condition0.operator){
+						 				case 0:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(!tmp_lr.data[targetindex0].equals(condition0.valueRight))
+													System.out.print("\n");
+											}
+						 					break;
+
+						 				case 3:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(tmp_lr.data[targetindex0].equals(condition0.valueRight))      
+													System.out.print("\n");
+											}
+						 					break;
+						 			}
+					 				break;
+						 		case 2:
+						 			// 右邊是數字
+						 			// 取得左邊在第幾個位置
+						 			
+						 			targetindex0 = 0;
+						 			for(String t : table0colname){
+						 				if(t.equalsIgnoreCase(condition0.valueLeft)){
+						 					break;
+						 				}else{
+						 					targetindex0++;
+						 				}
+						 			}
+						 			
+						 			switch(condition0.operator){
+						 				case 0:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													
+													if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
+											}
+						 					break;
+						 				case 1:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													
+													if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
+											}
+						 					break;
+						 				case 2:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													
+													if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
+											}
+						 					break;
+						 				case 3:
+
+								 			for(TableList.row_node tmp_lr : tn0_allRow){
+												for(int a:indexoftargetcol_onetable){
+													if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
+														System.out.print(tmp_lr.data[a] + "  ");
+												}
+												if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight))
+													System.out.print("\n");
+											}
+						 					break;
+						 			}
+					 				break;
+						 }
+						 						
 						//one condition
 						break;
 					case 2:
@@ -363,7 +509,7 @@ public class Select extends SQLRequest{
 			cs.typeLeft = 2;
 			cs.valueLeft = left;
 		} catch (NumberFormatException e) {
-			if(left.startsWith("'") && left.endsWith("'")) {
+			if(left.startsWith("\\'") && left.endsWith("\\'")) {
 				cs.typeLeft = 1;
 				cs.valueLeft = left.substring(1, left.length()-1);
 			} else {
@@ -389,29 +535,29 @@ public class Select extends SQLRequest{
 		// Right
 		try {
 			Integer.parseInt(right);
-			cs.typeLeft = 2;
-			cs.valueLeft = right;
+			cs.typeRight = 2;
+			cs.valueRight = right;
 		} catch (NumberFormatException e) {
-			if(left.startsWith("'") && right.endsWith("'")) {
-				cs.typeLeft = 1;
-				cs.valueLeft = right.substring(1, right.length()-1);
+			if(right.startsWith("\'") && right.endsWith("\'")) {
+				cs.typeRight = 1;
+				cs.valueRight = right.substring(1, right.length()-1);
 			} else {
-				cs.typeLeft = 0;
+				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				String t = findTableName(tmp_c[0]);
 
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = t;
-					String col = tmp_c[1];
+					String col = tmp_c[0];
 					checkCol(table, col);
-					cs.tableLeft = table;
-					cs.valueLeft = col;
+					cs.tableRight = table;
+					cs.valueRight = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
 					checkCol(table, col);
-					cs.tableLeft = table;
-					cs.valueLeft = col;
+					cs.tableRight = table;
+					cs.valueRight = col;
 				}			
 			}
 		}
@@ -422,20 +568,14 @@ public class Select extends SQLRequest{
 		
 		if(!col.equals("*")){
 			String useToSetNonTableNameCol = null;
-			boolean conflict = true;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){
 					useToSetNonTableNameCol = tmp_input_table_name.get(0);
-					conflict &= true;
 				} else {
-					conflict &= false;
+					throw new Exception("Table not found.");
 				}
 			}
-			if(conflict) {
-				throw new Exception("Column name conflicts.");
-			} else {
-				table = useToSetNonTableNameCol;
-			}
+			table = useToSetNonTableNameCol;
 		} else if(!Main.ct.ifExistCol(table,col)) {
 			throw new Exception("Column name not found.");
 		}

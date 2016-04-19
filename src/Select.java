@@ -1780,7 +1780,7 @@ public class Select extends SQLRequest{
 	
 	private void checkCol(String table, String col) throws Exception {
 		
-		if(!col.equals("*")){
+		if(!col.equals("*") && table == null) {
 			String useToSetNonTableNameCol = null;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){

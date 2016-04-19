@@ -7,7 +7,9 @@ public class Select extends SQLRequest{
 	
 	public Select(Command c) {
 		super(c);
-		colName = new ArrayList<List<String>>();
+		this.colName = new ArrayList<List<String>>();
+		this.tableName = new ArrayList<List<String>>();
+		this.condition = new ArrayList<ConditionStruct>();
 	}
 	
 	void parseValue(String input) throws Exception {
@@ -21,7 +23,7 @@ public class Select extends SQLRequest{
 		} else {
 			where = from.split(",");
 		}
-		tableLength = where.length;
+		constructTable(where);
 		if(input.contains("where")) {
 			String cond = input.split("where")[1].trim();
 			parseCondition(cond);
@@ -31,50 +33,40 @@ public class Select extends SQLRequest{
 		if(input.contains("count(") || input.contains("sum(")) {
 			parseAggr(col);
 		} else {
-			parseColTable(where, col);
+			parseColTable(col);
 		}
 		
+		System.out.println("colName");
 		for(List<String> l: this.colName) {
 			for(String s: l) {
 				System.out.println(s);
 			}
 		}
+		System.out.println("tableName");
+		for(List<String> l: this.tableName) {
+			for(String s: l) {
+				System.out.println(s);
+			}
+		}
+		System.out.println("op " + this.op);
+		System.out.println("aggr " + this.aggr);
 
 	}
 	
-	private void parseColTable(String[] where, String[] col) throws Exception {
+	private void parseColTable(String[] col) throws Exception {
 		// parse column and table
 		int i = 0;	
 		for(String c: col) {
 			this.colName.add(new ArrayList<String>());
-			int j = 0;
-			for(String t: where) {
-				String[] tmp_c = c.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
-				List<String> tmp_t = Arrays.asList(t.split(" as "));	// Table as t	tmp_t[0]=>Table	tmp_t[1]=>t
-			
-				// check table
-				if(i == 0 && Main.ct.checktablename(tmp_t.get(0)) == null) {
-					throw new Exception("table " + tmp_t.get(0) + " not exist.");
-				} else if(i == 0) {
-					// pass
-					this.tableName.add(new ArrayList<String>());
-					this.tableName.set(j, tmp_t);
-				}
-					
-				if(tmp_c.length == 1) {		// ambiguous variable
-					this.colName.get(i).add(null);
-					this.colName.get(i).add(tmp_c[0]);
-					break;
-				} else if(tmp_t.contains(tmp_c[0])) {	// Table.col or t.col
-					if(tmp_c[0].equals(tmp_t.get(0))) {
-						this.colName.get(i).add(tmp_c[0]);
-					} else {
-						this.colName.get(i).add(tmp_t.get(0));
-					}
-					this.colName.get(i).add(tmp_c[1]);
-					break;
-				}
-				j++;
+			String[] tmp_c = c.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
+			String t = findTableName(tmp_c[0]);
+
+			if(tmp_c.length == 1) {		// ambiguous variable
+				this.colName.get(i).add(null);
+				this.colName.get(i).add(tmp_c[0]);
+			} else if(t != null) {	// Table.col or t.col
+				this.colName.get(i).add(t);
+				this.colName.get(i).add(tmp_c[1]);
 			}
 			i++;
 		}
@@ -96,26 +88,24 @@ public class Select extends SQLRequest{
 		int i = 0;
 		// let parse by space
 		for(String s : expr) {
-			this.condition.add(new ArrayList<String>());
 			s.replaceAll(" ", "");
 			String[] tmp;
 			if(s.contains("<>")) {
 				tmp = s.split("<>");
-				this.operator.add(0);
+				this.condition.addAll(new ArrayList<ConditionStruct>(0));
 			} else if(s.contains("<")) {
 				tmp = s.split("<");					
-				this.operator.add(1);
+				this.condition.addAll(new ArrayList<ConditionStruct>(1));
 			} else if(s.contains(">")) {
 				tmp = s.split(">");
-				this.operator.add(2);
+				this.condition.addAll(new ArrayList<ConditionStruct>(2));
 			} else if(s.contains("=")) {
 				tmp = s.split("=");
-				this.operator.add(3);
+				this.condition.addAll(new ArrayList<ConditionStruct>(3));
 			} else {
 				throw new Exception("Syntax error: around where, operator not found");
 			}
-			parseExpression(tmp);
-
+			parseExpression(tmp[0].trim(), tmp[1].trim(), this.condition.get(i));
 			i++;
 		}
 	}
@@ -168,7 +158,7 @@ public class Select extends SQLRequest{
 				col_index1++;
 			}
 		}
-		
+	/*	
 		for(TableList.row_node col0 : subls0){
 			for(TableList.row_node col1 : subls1){
 				if(){
@@ -178,41 +168,99 @@ public class Select extends SQLRequest{
 			
 		}
 		
+		*/
 		
-		
+	}
+	
+	private void constructTable(String[] where) throws Exception {
+		int i = 0;
+		for(String t: where) {
+			String[] tmp_t = t.split(" as ");	// Table as t	tmp_t[0]=>Table	tmp_t[1]=>t
+			
+			// check table
+			if(Main.ct.checktablename(tmp_t[0]) == null) {
+				throw new Exception("table " + tmp_t[0] + " not exist.");
+			} else if(tmp_t.length == 1) {
+				this.tableName.add(new ArrayList<String>());
+				this.tableName.get(i).set(0, null);
+				this.tableName.get(i).set(1, tmp_t[0]);
+			} else {
+				// pass
+				this.tableName.add(new ArrayList<String>());
+				this.tableName.set(i, Arrays.asList(tmp_t));
+			}
+			i++;
+		}
 	}
 	
 	private String findTableName(String in) {
 		for(List<String> l: this.tableName) {
-			for(String s: l) {
-				if(s.equals(in)) {
-					return s;
-				}
-			}
+			if(l.indexOf(in) != -1)
+				return l.get(0);
 		}
 		return null;
 	}
 	
-	private void parseExpression(String[] tmp) {
-		int j = 0;
-		for(String ex: tmp) {
-			String[] tmp_c = ex.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
-			if(tmp_c.length == 1) {		// ambiguous variable
-				this.condition.get(j).add(null);
-				this.condition.get(j).add(tmp_c[0]);
-			} else if(this.tableName.contains(tmp_c[0])) {	// Table.col or t.col
+	private void parseExpression(String left, String right, ConditionStruct cs) {
+		// Left
+		try {
+			Integer.parseInt(left);
+			cs.typeLeft = 2;
+			cs.valueLeft = left;
+		} catch (NumberFormatException e) {
+			if(left.startsWith("'") && left.endsWith("'")) {
+				cs.typeLeft = 1;
+				cs.valueLeft = left.substring(1, left.length()-1);
+			} else {
+				cs.typeLeft = 0;
+				String[] tmp_c = left.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				String t = findTableName(tmp_c[0]);
-				this.condition.get(j).add(t);
-				this.condition.get(j).add(tmp_c[1]);
+
+				if(tmp_c.length == 1) {		// ambiguous variable
+					cs.valueLeft = tmp_c[1];
+				} else if(t != null) {	// Table.col or t.col
+					cs.valueLeft = t.concat("." + tmp_c[1]);
+				}
 			}
+		}
+		// Right
+		try {
+			Integer.parseInt(right);
+			cs.typeLeft = 2;
+			cs.valueLeft = right;
+		} catch (NumberFormatException e) {
+			if(left.startsWith("'") && right.endsWith("'")) {
+				cs.typeLeft = 1;
+				cs.valueLeft = right.substring(1, right.length()-1);
+			} else {
+				cs.typeLeft = 0;
+				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
+				String t = findTableName(tmp_c[0]);
+
+				if(tmp_c.length == 1) {		// ambiguous variable
+					cs.valueLeft = tmp_c[1];
+				} else if(t != null) {	// Table.col or t.col
+					cs.valueLeft = t.concat("." + tmp_c[1]);
+				}			}
 		}
 	}
 	
+	class ConditionStruct{
+		String valueLeft;
+		String valueRight;
+		int typeLeft;  // 0:table.col  , 1: String 2: Int
+		int typeRight;
+		int operator;	// 0 for <>; 1 for <; 2 for >; 3 for =
+		
+		ConditionStruct(int o) {
+			this.operator = o;
+		}
+	}
+	
+	
 	public List<List<String>> colName;
 	public List<List<String>> tableName;
-	public List<List<String>> condition;
-	public List<Integer> operator;	// 0 for <>; 1 for <; 2 for >; 3 for =
-	public int tableLength;
+	public List<ConditionStruct> condition;
 	public int op = 0;	// 0 for none; 1 for and; 2 for or
 	public int aggr = 0;	// 0 for none; 1 for count; 2 for sum
 

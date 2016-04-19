@@ -122,38 +122,7 @@ public class Select extends SQLRequest{
 	
 	public void doSelectFunction(TableList ct){
 		
-		int col_index0 = 0;
-		int col_index1 = 0;
-		List<String> ls0 = colName.get(0);
-		//List<String> ls1 = colName.get(1);
 		
-		 
-	
-		String[] ls0_table_colname = ct.getColName(ls0.get(0));
-		//String[] ls1_table_colname = ct.getColName(ls1.get(0));
-		
-		List<TableList.row_node> subls0 = ct.return_colList(ls0.get(0));
-		//List<TableList.row_node> subls1 = ct.return_colList(ls1.get(0));
-	
-		
-		// 找尋目標的col 是第幾個
-		for(String tmp:ls0_table_colname){
-			if(tmp.equals(ls0.get(1))){
-				
-			}else{
-				col_index0++;
-			}
-		}
-		
-		/*for(String tmp:ls1_table_colname){
-			if(tmp.equals(ls1.get(1))){
-				
-			}else{
-				col_index1++;
-			}
-		}
-		*/
-	//where a.name = "sss";
 		ConditionStruct tmp0 = null;
 		ConditionStruct tmp1 = null;
 		ConditionStruct tmp2 = null;
@@ -162,22 +131,31 @@ public class Select extends SQLRequest{
 		
 		int table_count = this.tableName.size();
 		String tablename0,tablename1 = null;
+		List<TableList.row_node> tn0_allRow = null;
+		List<TableList.row_node> tn1_allRow = null;
+		String []table0colname = null;
+		String []table1colname = null;
+		List<Integer> indexoftargetcol_onetable = null;
+		List<List<Integer>> indexoftargetcol_twotable = null;
+		int lenofcondition = 0;
+		int tmpc =0;
 		switch(table_count){
 			
 			case 1:
 				tablename0 = this.tableName.get(0).get(0);
 				// 取出table的全部col
-				List<TableList.row_node> tn0_allRow = ct.return_colList(tablename0);
-				String []tablecolname = ct.getColName(tablename0);
-				List<Integer> indexoftargetcol = new ArrayList<Integer>();
+				tn0_allRow = ct.return_colList(tablename0);
+				table0colname = ct.getColName(tablename0);
+				indexoftargetcol_onetable = new ArrayList<Integer>();
 				
 				
 				// 把要拿出來的col 在原本table裡的位置存出來
 				for(List<String> targetcol: this.colName){
-					for(String c : tablecolname){
-						int tmpc = 0;
+					tmpc = 0;
+					for(String c : table0colname){
+						
 						if(targetcol.get(1).equalsIgnoreCase(c)){
-							indexoftargetcol.add(tmpc);
+							indexoftargetcol_onetable.add(tmpc);
 							tmpc = 0;
 							break;
 						}else{
@@ -188,14 +166,14 @@ public class Select extends SQLRequest{
 				
 				
 				//得到condition
-				int lenofcondition = this.condition.size();
+				lenofcondition = this.condition.size();
 				switch(lenofcondition){
 					case 0:
 						// 沒有 where
 						//select name,apple
 						//from table
 						for(TableList.row_node tmp_lr : tn0_allRow){
-							for(int a:indexoftargetcol){
+							for(int a:indexoftargetcol_onetable){
 								System.out.print(tmp_lr.data[a] + "  ");
 							}
 							System.out.print("\n");
@@ -216,13 +194,56 @@ public class Select extends SQLRequest{
 						System.out.println("wrong");
 						break;
 				}
-
-				
-				
 				break;
 			case 2:
 				tablename0 = this.tableName.get(0).get(0);
 				tablename1 = this.tableName.get(1).get(0);
+				
+				// 取出table的全部col
+				tn0_allRow = ct.return_colList(tablename0);
+				tn1_allRow = ct.return_colList(tablename1);
+				table0colname = ct.getColName(tablename0);
+				table1colname = ct.getColName(tablename1);
+				indexoftargetcol_twotable= new ArrayList<List<Integer>>();
+				
+				for(List<String> targetcol : this.colName){
+					if(targetcol.get(0).equals(tablename0)){
+						for(String c : table0colname){
+							
+							if(targetcol.get(1).equalsIgnoreCase(c)){
+								
+								List<Integer> tmpLI = null;
+								tmpLI.add(tmpc);
+								tmpLI.add(0);
+								indexoftargetcol_twotable.add(tmpLI);
+								tmpc = 0;
+								break;
+							}else{
+								tmpc++;
+							}
+						}
+					}else if(targetcol.get(0).equals(tablename1)){
+						for(String c : table1colname){
+							
+							if(targetcol.get(1).equalsIgnoreCase(c)){
+								
+								List<Integer> tmpLI = null;
+								tmpLI.add(tmpc);
+								tmpLI.add(1);
+								indexoftargetcol_twotable.add(tmpLI);
+								tmpc = 0;
+								break;
+							}else{
+								tmpc++;
+							}
+						}
+					}
+				}
+				
+				
+				
+				
+				
 				break;
 			default:
 				break;

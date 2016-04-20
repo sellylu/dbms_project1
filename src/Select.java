@@ -1557,6 +1557,7 @@ public class Select extends SQLRequest{
 						switch(condition0.typeRight){
 							case 0:
 								targetindex0 = 0;
+								//System.out.println("----" + condition0.tableLeft + " -----" + tablename0);
 								if(condition0.tableLeft.equalsIgnoreCase(tablename0)){
 									for(String t : table0colname){
 										if(t.equalsIgnoreCase(condition0.valueLeft)){
@@ -1978,7 +1979,8 @@ public class Select extends SQLRequest{
 									break;
 								case 1:
 							 		//右邊是字串
-									targetindex2 = 0;
+
+									//System.out.println("wwwww =" + condition1.tableLeft);
 									if(condition1.tableLeft.equalsIgnoreCase(tablename0)){
 										for(String t : table0colname){
 											if(t.equalsIgnoreCase(condition1.valueLeft)){
@@ -2278,13 +2280,13 @@ public class Select extends SQLRequest{
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = null;
 					String col = tmp_c[0];
-					cs.dataLeft = checkCol(table, col);
-					cs.tableLeft = table;
+					cs.tableLeft = checkCol(table, col,cs, 0);
+					//cs.tableLeft = table;
 					cs.valueLeft = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
-					cs.dataLeft = checkCol(table, col);
+					checkCol(table, col,cs, 0);
 					cs.tableLeft = table;
 					cs.valueLeft = col;
 				}
@@ -2309,46 +2311,52 @@ public class Select extends SQLRequest{
 				if(tmp_c.length == 1) {		// ambiguous variable
 					String table = t;
 					String col = tmp_c[0];
-					cs.dataRight = checkCol(table, col);
-					cs.tableRight = table;
+					cs.tableRight = checkCol(table, col,cs, 1);
+					//cs.tableRight = table;
 					cs.valueRight = col;
 				} else if(t != null) {	// Table.col or t.col
 					String table = t;
 					String col = tmp_c[1];
-					cs.dataRight = checkCol(table, col);
+					checkCol(table, col,cs, 1);
 					cs.tableRight = table;
 					cs.valueRight = col;
 				}
 			}
 		}
 		
-		if(cs.dataLeft == null) {
+		/*if(cs.dataLeft == null) {
 			throw new Exception("Datatype not match1");
 		}else if(cs.dataRight == null){
 			throw new Exception("Datatype not match2");
 		}else if(!cs.dataLeft.equalsIgnoreCase(cs.dataRight)) {
 			throw new Exception("Datatype not match3");
-		}
+		}*/
 	}
 	
 	
-	private String checkCol(String table, String col) throws Exception {
+	private String checkCol(String table, String col,ConditionStruct ct,int n) throws Exception {
 		String datatype = null;
+		String useToSetNonTableNameCol = null;
 		if(!col.equals("*") && table == null) {
-			String useToSetNonTableNameCol = null;
 			for(List<String> tmp_input_table_name : this.tableName){
 				if(Main.ct.ifExistCol(tmp_input_table_name.get(0),col) == true){
 					datatype = Main.ct.getDataType(tmp_input_table_name.get(0), col);
 					useToSetNonTableNameCol = tmp_input_table_name.get(0);
-				} else {
-					throw new Exception("Table not found.");
+					break;
 				}
 			}
-			table = useToSetNonTableNameCol;
+			if(useToSetNonTableNameCol == null)
+				throw new Exception("Table not found");
+			if(n ==0){ //left
+				ct.dataLeft = datatype;
+			}else{
+				ct.dataRight = datatype;
+			}
+			
 		} else if(!Main.ct.ifExistCol(table,col)) {
 			throw new Exception("Column name not found.");
 		}
-		return datatype;
+		return useToSetNonTableNameCol;
 	}
 	
 	private int checkAggr(String le, String ri, String a, String type, int count, int op, int num) {

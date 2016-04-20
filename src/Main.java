@@ -165,7 +165,7 @@ public class Main {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());
-				//e.printStackTrace();
+				e.printStackTrace();
 			}	
 	
 		}

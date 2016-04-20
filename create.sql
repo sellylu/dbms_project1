@@ -1,10 +1,13 @@
-CREATE TABLE Book (
-bookId int PRIMARY KEY,
-title varchar(30), pages int,
-authorId int, editorial varchar(30)
-);
-CREATE TABLE Author (
-authorId int PRIMARY KEY, name varchar(30), nationality varchar(30)
-);
-IMPORT book2.sql;
-IMPORT author.sql;
+create table tweets(
+twid int primary key,
+tweet varchar(30),
+utcDate varchar(30),
+city varchar(30),
+userId int);
+import tweets.sql;
+
+create table user1 (
+userId int primary key,
+name varchar(30),
+userLocation varchar(30));
+import user1.sql;

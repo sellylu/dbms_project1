@@ -2264,10 +2264,12 @@ public class Select extends SQLRequest{
 			Integer.parseInt(left);
 			cs.typeLeft = 2;
 			cs.valueLeft = left;
+			cs.dataLeft ="int";
 		} catch (NumberFormatException e) {
 			if(left.startsWith("\\'") && left.endsWith("\\'")) {
 				cs.typeLeft = 1;
 				cs.valueLeft = left;
+				cs.dataLeft ="varchar";
 			} else {
 				cs.typeLeft = 0;
 				String[] tmp_c = left.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
@@ -2293,10 +2295,12 @@ public class Select extends SQLRequest{
 			Integer.parseInt(right);
 			cs.typeRight = 2;
 			cs.valueRight = right;
+			cs.dataRight ="int";
 		} catch (NumberFormatException e) {
 			if(right.startsWith("\'") && right.endsWith("\'")) {
 				cs.typeRight = 1;
 				cs.valueRight = right;
+				cs.dataRight = "varchar";
 			} else {
 				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
@@ -2314,17 +2318,17 @@ public class Select extends SQLRequest{
 					cs.dataRight = checkCol(table, col);
 					cs.tableRight = table;
 					cs.valueRight = col;
-				}			
+				}
 			}
 		}
 		
-		if(cs.dataLeft == null || cs.dataRight == null) {
-			throw new Exception("Dayatype not match");
-		} else if(!cs.dataLeft.equalsIgnoreCase(cs.dataRight)) {
-			throw new Exception("Dayatype not match");
+		if(cs.dataLeft == null) {
+			throw new Exception("Datatype not match1");
+		}else if(cs.dataRight == null){
+			throw new Exception("Datatype not match2");
+		}else if(!cs.dataLeft.equalsIgnoreCase(cs.dataRight)) {
+			throw new Exception("Datatype not match3");
 		}
-		
-
 	}
 	
 	

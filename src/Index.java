@@ -16,4 +16,6 @@ public class Index {
 		btree = new BTree();
 	}
 	
+	public String getName() { return this.indexname;}
+	
 }

@@ -9,6 +9,7 @@ import java.util.*;
 public class Main {
 	
 	public static TableList ct;
+	public static List<Index> indexlist;
 	
 	public static String[] getFileContent(String fileName) {
 		
@@ -41,7 +42,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		Parser parser;
 		ct = new TableList();
-		List<Index> indexlist = new ArrayList<Index>();
+		indexlist = new ArrayList<Index>();
 		
 		List<String> remains = new ArrayList<String>();
 		String command;

@@ -1,9 +1,13 @@
 
 public class CreateIndex extends SQLRequest{
 
-	public CreateIndex(Command c, String n) {
+	public CreateIndex(Command c, String n) throws Exception {
 		super(c);
 		this.name = n;
+		for(Index in: Main.indexlist) {
+			if(in.getName() == this.name) 
+				throw new Exception("Index name existed");
+		}
 	}
 	
 	void parseValue(String input) throws Exception {

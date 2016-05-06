@@ -4,5 +4,6 @@ public enum Command {
 	Insert,
 	Select,
 	ImportFile,
+	CreateIndex,
 	Error
 }

@@ -57,6 +57,17 @@ public class Parser {
 		} else if(command[0].equalsIgnoreCase("import")) {
 			ImportFile im = new ImportFile(Command.ImportFile, command[1]);
 			r = im;
+		} else if(command[0].equalsIgnoreCase("create") && command[1].equalsIgnoreCase("index")) {
+			
+			String[] tmp = input.split("\\(", 2);
+			if(tmp.length < 2 || !tmp[1].contains(")"))
+				throw new Exception("Syntax Error: bracket ()");
+			if(tmp[0].split(" ").length != 5)
+				throw new Exception("Command Not Found.");
+			
+			CreateIndex ci = new CreateIndex(Command.CreateIndex, command[2]);
+			ci.parseValue(input);
+			r = ci;
 		} else {
 			r = new SQLRequest(Command.Error);
 			throw new Exception("Command Not Found.");

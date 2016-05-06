@@ -157,6 +157,9 @@ public class Main {
 						if(in != null)
 							remains.addAll(Arrays.asList(in));
 						break;
+					case CreateIndex:
+						CreateIndex ci = (CreateIndex)parser.r;
+						break;
 					default:
 				}
 				

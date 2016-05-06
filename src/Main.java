@@ -159,11 +159,13 @@ public class Main {
 						break;
 					case CreateIndex:
 						CreateIndex ci = (CreateIndex)parser.r;
+						
 						break;
 					default:
 				}
 				
-				if(remains.size() == 0 && parser.r.getCommand() != Command.Select)
+				if(remains.size() == 0 &&
+						parser.r.getCommand() != Command.Select && parser.r.getCommand() != Command.CreateIndex)
 					ct.printtb();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

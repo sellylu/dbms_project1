@@ -41,6 +41,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		Parser parser;
 		ct = new TableList();
+		List<Index> indexlist = new ArrayList<Index>();
 		
 		List<String> remains = new ArrayList<String>();
 		String command;
@@ -159,6 +160,8 @@ public class Main {
 						break;
 					case CreateIndex:
 						CreateIndex ci = (CreateIndex)parser.r;
+						Index index = new Index(ci.name,ci.colName,ci.tableName);
+						indexlist.add(index);
 						break;
 					default:
 				}

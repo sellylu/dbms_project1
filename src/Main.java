@@ -41,7 +41,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		Parser parser;
 		ct = new TableList();
-		List<Index> indexlist = new ArrayList<Index>();
+		IndexList indexlist = new IndexList();
 		
 		List<String> remains = new ArrayList<String>();
 		String command;
@@ -124,6 +124,8 @@ public class Main {
 							switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
 								case 0:
 									ct.insertRow(tn, i.colValue);
+									
+									
 									break;
 								case 1:
 									System.out.println("[Error]  Overflow!");
@@ -161,7 +163,7 @@ public class Main {
 					case CreateIndex:
 						CreateIndex ci = (CreateIndex)parser.r;
 						Index index = new Index(ci.name,ci.colName,ci.tableName);
-						indexlist.add(index);
+						indexlist.addIndex(index);
 						break;
 					default:
 				}

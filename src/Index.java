@@ -37,7 +37,7 @@ public class Index {
 	protected String colname;
 	protected String indexname;
 	
-	private BTree btree;
+	public BTree btree;
 	public Index(String indexname,String tablename , String colname){
 		
 		this.tablename = tablename;

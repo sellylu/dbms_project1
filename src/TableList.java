@@ -8,6 +8,7 @@ public class TableList {
 		String tablename;
 		table_node next_table;
 		String []colname;
+		int []indexCheck;
 		String []datatype;
 		row rowlist;
 		int primary_key;
@@ -19,6 +20,7 @@ public class TableList {
 			this.tablename = tablename;
 			this.datatype = new String[datatype.length];
 			this.colname = new String[colname.length];
+			this.indexCheck = new int[colname.length];
 			varchar_map = new HashMap<String, Integer>();
 			
 			for(int i=0;i<datatype.length;i++){
@@ -187,17 +189,22 @@ public class TableList {
 		return false;
 	}
 	
-	public void insertRow(table_node now_table, String[] input){
+	public row_node insertRow(table_node now_table, String[] input){
 		if(now_table.rowlist.head_row == null){
 			now_table.rowlist.head_row = new row_node(input);
 			now_table.rowlist.now_row = now_table.rowlist.head_row;
+			return now_table.rowlist.now_row;
+			
 			
 		}else{
 			row_node row2 = new row_node(input);
 			now_table.rowlist.now_row.next_row = row2;
 			now_table.rowlist.now_row = 	now_table.rowlist.now_row.next_row;
+			return row2;
 		
 		}
+		
+		
 	}
 	
 	public void printtb(){
@@ -335,5 +342,31 @@ public class TableList {
 		
 		return null;
 	}
+	
+	public void setIndex(String tableName,String colName){
+		table_node tb = this.checktablename(tableName);
+		String[] col = this.getColName(tableName);
+		int t =0 ;
+		for(String c : col){
+			if(c.equals(colName)){
+				tb.indexCheck[t] = 1;
+				return;
+			}
+		}
+	
+	}
+	
+	public int checkIndex(table_node tablenode,String colName){
+		
+		int t =0 ;
+		for(String c : tablenode.colname){
+			if(c.equals(colName)){
+				return tablenode.indexCheck[t];
+			}
+		}
+		return 0;
+	}
+		
+		
 	
 }

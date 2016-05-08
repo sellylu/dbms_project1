@@ -124,7 +124,17 @@ public class Main {
 							}
 							switch(ct.checkRowDatatypeAndLength(tn, i.colValue,i.colName)){
 								case 0:
-									ct.insertRow(tn, i.colValue);
+									TableList.row_node rn = ct.insertRow(tn, i.colValue);
+									int tmpi=0;
+									for(String s:i.colName){
+										if(ct.checkIndex(tn,s) == 1){
+											Index in = indexlist.getIndex(tn.tablename, s);
+											in.btree.put(i.colValue[tmpi], rn);
+										}
+										tmpi++;
+									}
+									
+									
 									break;
 								case 1:
 									System.out.println("[Error]  Overflow!");
@@ -163,7 +173,10 @@ public class Main {
 						CreateIndex ci = (CreateIndex)parser.r;
 
 						Index index = new Index(ci.name,ci.colName,ci.tableName);
-						indexlist.add(index);
+						Index index = new Index(ci.name,ci.tableName,ci.colName);
+						indexlist.addIndex(index);
+						ct.setIndex(ci.tableName,ci.colName);
+>>>>>>> 8d0140ff9255bd2fa07f74abb63138437ed4afb4
 						break;
 					default:
 				}

@@ -9,8 +9,7 @@ import java.util.*;
 public class Main {
 	
 	public static TableList ct;
-	public static List<Index> indexlist;
-	
+	public static IndexList indexlist;
 	public static String[] getFileContent(String fileName) {
 		
 		FileReader file;
@@ -42,7 +41,7 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		Parser parser;
 		ct = new TableList();
-		indexlist = new ArrayList<Index>();
+		indexlist = new IndexList();
 		
 		List<String> remains = new ArrayList<String>();
 		String command;
@@ -172,11 +171,9 @@ public class Main {
 					case CreateIndex:
 						CreateIndex ci = (CreateIndex)parser.r;
 
-						Index index = new Index(ci.name,ci.colName,ci.tableName);
 						Index index = new Index(ci.name,ci.tableName,ci.colName);
 						indexlist.addIndex(index);
 						ct.setIndex(ci.tableName,ci.colName);
->>>>>>> 8d0140ff9255bd2fa07f74abb63138437ed4afb4
 						break;
 					default:
 				}

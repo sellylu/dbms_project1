@@ -31,4 +31,12 @@ public class IndexList {
 	public void addIndex(Index index){
 		list.add(index);
 	}
+	
+	public void checkName(String name) throws Exception {
+		for(Index i: list) {
+			if(i.getName() == name)
+				throw new Exception("Index name existed");
+		}
+	}
+	
 }

@@ -2304,13 +2304,13 @@ public class Select extends SQLRequest{
 			cs.typeRight = 2;
 			cs.valueRight = right;
 			cs.dataRight ="int";
-			cs.indexRight = true;
+			cs.indexRight = false;
 		} catch (NumberFormatException e) {
 			if(right.startsWith("\'") && right.endsWith("\'")) {
 				cs.typeRight = 1;
 				cs.valueRight = right;
 				cs.dataRight = "varchar";
-				cs.indexRight = true;
+				cs.indexRight = false;
 			} else {
 				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
@@ -2498,15 +2498,17 @@ public class Select extends SQLRequest{
 	}
 	
 	private List<TableList.row_node> getCondResult(Index i, ConditionStruct cs) {
+		Integer integer = new Integer(cs.valueRight);
 		switch(cs.operator) {
+		
 		case 0:	// not equal
-			return i.btree.get_notequal(cs.valueRight);
+			return i.btree.get_notequal(integer);
 		case 1:	// smaller
-			return i.btree.get_less(cs.valueRight);
+			return i.btree.get_less(integer);
 		case 2:	// greater
-			return i.btree.get_bigger(cs.valueRight);
+			return i.btree.get_bigger(integer);
 		case 3:	// equal
-			return i.btree.get(cs.valueRight);
+			return i.btree.get(integer);
 		default:
 			return null;
 		}
@@ -2525,47 +2527,118 @@ public class Select extends SQLRequest{
 	private void twoCond_oneIndex(List<TableList.row_node> l1,ConditionStruct cs2) {
 		int a = Main.ct.checktablename(cs2.tableLeft).getColumnIndex(cs2.valueLeft);
 		
+		
 		switch(this.op) {
 		case 1:	// AND
-			if(cs2.typeRight != 0) {
 				for(Object o: l1) {
 					TableList.row_node rn = (TableList.row_node)o;
-					if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
-						continue;
-					} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
-						continue;
-					} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
-						continue;
-					} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
-						continue;
-					} else {
-						l1.remove(o);
+					switch(cs2.typeRight){
+					case 0:
+						int b = Main.ct.checktablename(cs2.tableRight).getColumnIndex(cs2.valueRight);
+						String type = cs2.dataLeft;
+						if(type.equals("int")){
+							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+								continue;
+							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn.data[b]) && cs2.operator == 1) {
+								continue;
+							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn.data[b]) && cs2.operator == 2) {
+								continue;
+							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								continue;
+							} else {
+								l1.remove(o);
+							}
+						}else if(type.equals("varchar")){
+							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							continue;
+							}
+						}
+					case 1:
+						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+							continue;
+						}else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+							continue;
+						} else {
+							l1.remove(o);
+						}
+						break;
+					case 2:
+					
+						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+							continue;
+						} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
+							continue;
+						} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
+							continue;
+						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+							continue;
+						} else {
+							l1.remove(o);
+						}
+						break;
+						
+					
 					}
+					
 				}
-			} else {
-				// TODO: if comparing columns
-			}
 			break;
 		case 2:	// OR
-			if(cs2.typeRight != 0) {
 				List<TableList.row_node> row_list = Main.ct.return_colList(cs2.tableLeft);
 				List<TableList.row_node> tmp = new ArrayList<TableList.row_node>();
 				for(TableList.row_node rn : row_list) {
-					if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
-						tmp.add(rn);
-					} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
-						tmp.add(rn);
-					} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
-						tmp.add(rn);
-					} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
-						tmp.add(rn);
+					
+					switch(cs2.typeRight){
+					case 0:
+						int b = Main.ct.checktablename(cs2.tableRight).getColumnIndex(cs2.valueRight);
+						String type = cs2.dataLeft;
+						if(type.equals("int")){
+							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+								continue;
+							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn.data[b]) && cs2.operator == 1) {
+								continue;
+							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn.data[b]) && cs2.operator == 2) {
+								continue;
+							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								continue;
+							} else {
+								l1.remove(tmp);
+							}
+						}else if(type.equals("varchar")){
+							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							continue;
+							}
+						}
+					case 1:
+						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+							continue;
+						}else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+							continue;
+						} else {
+							l1.remove(tmp);
+						}
+						break;
+					case 2:
+					
+						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+							continue;
+						} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
+							continue;
+						} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
+							continue;
+						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+							continue;
+						} else {
+							l1.remove(tmp);
+						}
+						break;
+						
+					
 					}
+					
 				}
 				l1.removeAll(tmp);
 				l1.addAll(tmp);
-			} else {
-				// TODO: if comparing columns
-			}
+			
 			break;
 		}
 	}

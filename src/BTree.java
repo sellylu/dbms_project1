@@ -271,7 +271,8 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      * @param  val the value
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
-    public void put(Key key, int val) {
+    public void put(Key key, TableList.row_node val) {
+    	
         if (key == null) throw new NullPointerException("key must not be null");
         Node u = insert(root, key, val, height); 
         N++;
@@ -285,7 +286,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         height++;
     }
 
-    private Node insert(Node h, Key key, int val, int ht) {
+    private Node insert(Node h, Key key, TableList.row_node val, int ht) {
         int j;
         Entry tmp_entry;
         if((tmp_entry = search_entry(root,key,ht)) != null){
@@ -373,7 +374,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     private boolean eq(Comparable k1, Comparable k2) {
         return k1.compareTo(k2) == 0;
     }
-
+    
 
     /*
     public static void main(String[] args) {

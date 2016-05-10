@@ -80,11 +80,17 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      *         and <tt>null</tt> if the key is not in the symbol table
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
+    
+    
+    // equal
     public List get(Key key) {
         if (key == null) throw new NullPointerException("key must not be null");
         return search(root, key, height);
     }
-
+    
+    
+    
+    
     private List search(Node x, Key key, int ht) {
         Entry[] children = x.children;
 
@@ -104,6 +110,37 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         }
         return null;
     }
+    
+    public List get_notequal(Key key) {
+        if (key == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        return search_notequal(store,root, key, height);
+    }
+    
+    private List search_notequal(List store,Node x, Key key, int ht) {
+        Entry[] children = x.children;
+
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+                if (!eq(key, children[j].key))  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || less(key, children[j+1].key))
+                    search_notequal(store,children[j].next, key, ht-1);
+            }
+        }
+        return null;
+    }
+    
     private Entry search_entry(Node x,Key key,int height){
     	Entry[] children = x.children;
 

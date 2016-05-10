@@ -74,18 +74,18 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      *         and <tt>null</tt> if the key is not in the symbol table
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
-    public List get(Key key) {
+    public Value get(Key key) {
         if (key == null) throw new NullPointerException("key must not be null");
         return search(root, key, height);
     }
 
-    private List search(Node x, Key key, int ht) {
+    private Value search(Node x, Key key, int ht) {
         Entry[] children = x.children;
 
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
-                if (eq(key, children[j].key)) return (List) children[j].val;
+                if (eq(key, children[j].key)) return (Value) children[j].val;
             }
         }
 

@@ -169,8 +169,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         // internal node
         else {
             for (int j = 0; j < x.m; j++) {
-            	System.out.println("bigger " + children[j].key);
-                if (j+1 == x.m || bigger(key, children[j].key) ||bigger(key, children[j+1].key))
+            	if (j+1 == x.m || bigger(key, children[j].key) ||bigger(key, children[j+1].key))
                     search_bigger(store,children[j].next, key, ht-1);
             }
         }

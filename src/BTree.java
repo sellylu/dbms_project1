@@ -152,11 +152,13 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     }
     
     private List search_bigger(List store,Node x, Key key, int ht) {
+    	//System.out.println("ht = " + ht);
         Entry[] children = x.children;
-
+        
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
+            	
                 if (bigger(key, children[j].key))  {
                 	for(Object i : children[j].address){
                 		store.add(i);
@@ -168,7 +170,8 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         // internal node
         else {
             for (int j = 0; j < x.m; j++) {
-                if (j+1 == x.m || bigger(key, children[j+1].key))
+            	System.out.println("bigger " + children[j].key);
+                if (j+1 == x.m || bigger(key, children[j].key) ||bigger(key, children[j+1].key))
                     search_bigger(store,children[j].next, key, ht-1);
             }
         }
@@ -184,10 +187,12 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     
     private List search_less(List store,Node x, Key key, int ht) {
         Entry[] children = x.children;
+        
 
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
+            	
                 if (less(key, children[j].key))  {
                 	for(Object i : children[j].address){
                 		store.add(i);
@@ -201,6 +206,38 @@ public class BTree<Key extends Comparable<Key>, Value>  {
             for (int j = 0; j < x.m; j++) {
                 if (j+1 == x.m || less(key, children[j+1].key))
                     search_less(store,children[j].next, key, ht-1);
+            }
+        }
+        return null;
+    }
+    
+    public List get_range(Key key1,Key key2) {
+        if (key1 == null) throw new NullPointerException("key must not be null");
+        if (key2 == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        search_range(store,root, key1, key2, height);
+        return store;
+    }
+    
+    private List search_range(List store,Node x, Key key1, Key key2, int ht) {
+        Entry[] children = x.children;
+
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+                if (bigger(key1, children[j].key) && less(key2,children[j].key) )  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || (bigger(key1, children[j].key)||(bigger(key1, children[j+1].key)) && less(key2,children[j+1].key)))
+                    search_range(store,children[j].next, key1,key2, ht-1);
             }
         }
         return null;
@@ -327,6 +364,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     // comparison functions - make Comparable instead of Key to avoid casts
     private boolean bigger(Comparable k1, Comparable k2) {
         return k1.compareTo(k2) < 0;
+        
     }
     
     private boolean less(Comparable k1, Comparable k2) {
@@ -343,15 +381,16 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         Main<Integer, Integer> st = new Main<Integer, Integer>();
         
         
-        st.put(500, 1000);
-        for(int i =0;i<100;i++){
+        //st.put(500, 1000);
+        for(int i =1;i<100;i++){
         	st.put(i,i);
         }
 
 
-        List c = st.get_less(49);
-        List d = st.get_bigger(50);
-        for(Object i:d){
+       //List c = st.get_less(62);
+        List d = st.get_bigger(39);
+        List e = st.get_range(51,99);
+        for(Object i:e){
         	System.out.println(i);
         }
         

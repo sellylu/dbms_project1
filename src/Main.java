@@ -129,7 +129,8 @@ public class Main {
 									for(String s:i.colName){
 										if(ct.checkIndex(tn,s)){
 											Index in = indexlist.getIndex(tn.tablename, s);
-											in.btree.put(i.colValue[tmpi], rn);
+											Integer integer = new Integer(Integer.parseInt(i.colValue[tmpi]));
+											in.btree.put( integer, rn);
 										}
 										tmpi++;
 									}
@@ -189,9 +190,11 @@ public class Main {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());
 				e.printStackTrace();
+
 			} finally {
 				System.out.println("Execution time: " + (System.currentTimeMillis() - tStart));
 			}
+
 	
 		}
 	}

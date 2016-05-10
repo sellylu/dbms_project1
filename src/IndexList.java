@@ -13,6 +13,7 @@ public class IndexList {
 	public Boolean checkIndex(String tablename,String colname){
 		for(Index i : list){
 			if(i.tablename.equalsIgnoreCase(tablename) && i.colname.equalsIgnoreCase(colname)){
+
 				return true;
 			}
 		}

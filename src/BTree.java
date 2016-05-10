@@ -74,6 +74,14 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      *         and <tt>null</tt> if the key is not in the symbol table
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
+    // TODO: implement following two function
+    public List getRange(Key a, Key b) {
+    	return null;
+    }
+    public List getNotEqual(Key k) {
+    	return null;
+    }
+    
     public List get(Key key) {
         if (key == null) throw new NullPointerException("key must not be null");
         return search(root, key, height);

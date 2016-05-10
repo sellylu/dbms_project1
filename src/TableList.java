@@ -8,7 +8,7 @@ public class TableList {
 		String tablename;
 		table_node next_table;
 		String []colname;
-		int []indexCheck;
+		boolean []indexCheck;
 		String []datatype;
 		row rowlist;
 		int primary_key;
@@ -20,7 +20,7 @@ public class TableList {
 			this.tablename = tablename;
 			this.datatype = new String[datatype.length];
 			this.colname = new String[colname.length];
-			this.indexCheck = new int[colname.length];
+			this.indexCheck = new boolean[colname.length];
 			varchar_map = new HashMap<String, Integer>();
 			
 			for(int i=0;i<datatype.length;i++){
@@ -40,6 +40,16 @@ public class TableList {
 			next_table = null;
 			this.primary_key = primary_key;
 			rowlist = new row();
+		}
+		
+		public int getColumnIndex(String col) {
+			int count = 0;
+			for(String s: this.colname) {
+				if(s.equalsIgnoreCase(col))
+					return count;
+				count++;
+			}
+			return 0;
 		}
 
 		
@@ -348,23 +358,25 @@ public class TableList {
 		String[] col = this.getColName(tableName);
 		int t =0 ;
 		for(String c : col){
-			if(c.equals(colName)){
-				tb.indexCheck[t] = 1;
+			if(c.equalsIgnoreCase(colName)){
+				tb.indexCheck[t] = true;
 				return;
 			}
+			t++;
 		}
 	
 	}
 	
-	public int checkIndex(table_node tablenode,String colName){
+	public boolean checkIndex(table_node tablenode,String colName){
 		
 		int t =0 ;
 		for(String c : tablenode.colname){
-			if(c.equals(colName)){
+			if(c.equalsIgnoreCase(colName)){
 				return tablenode.indexCheck[t];
 			}
+			t++;
 		}
-		return 0;
+		return false;
 	}
 		
 		

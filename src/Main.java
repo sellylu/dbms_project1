@@ -126,7 +126,7 @@ public class Main {
 									TableList.row_node rn = ct.insertRow(tn, i.colValue);
 									int tmpi=0;
 									for(String s:i.colName){
-										if(ct.checkIndex(tn,s) == 1){
+										if(ct.checkIndex(tn,s)){
 											Index in = indexlist.getIndex(tn.tablename, s);
 											in.btree.put(i.colValue[tmpi], rn);
 										}
@@ -155,10 +155,13 @@ public class Main {
 						break;
 					case Select:
 						Select s = (Select)parser.r;
-						if(ct.checkColInTable(s.tableName,s.colName) == true){
+						
+						if(s.checkIndex()) {
+							s.doIndexSelect();
+						} else if(ct.checkColInTable(s.tableName,s.colName) == true){
 							s.doSelectFunction(ct);
 							
-						}else{
+						} else {
 							
 						}
 						break;

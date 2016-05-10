@@ -6,6 +6,7 @@ create table tweets(
 	userId int
 );
 
+
 import tweets.sql;
 
 create table user1 (
@@ -13,5 +14,6 @@ create table user1 (
 	name varchar(30),
 	userLocation varchar(30)
 );
+
 
 import user1.sql;

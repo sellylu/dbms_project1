@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -128,7 +129,6 @@ public class Select extends SQLRequest{
 		ConditionStruct condition1 = null;
 		// 判斷 From 多少table
 		
-		int table_count = this.tableName.size();
 		String tablename0,tablename1 = null;
 		List<TableList.row_node> tn0_allRow = null;
 		List<TableList.row_node> tn1_allRow = null;
@@ -149,7 +149,7 @@ public class Select extends SQLRequest{
 		List<Integer> checkList0;
 		List<Integer> checkList1;
 		int doit;
-		switch(table_count){
+		switch(this.tableName.size()){
 			
 			case 1:
 				tablename0 = this.tableName.get(0).get(0);
@@ -2267,26 +2267,34 @@ public class Select extends SQLRequest{
 			cs.typeLeft = 2;
 			cs.valueLeft = left;
 			cs.dataLeft ="int";
+			cs.indexLeft = false;
 		} catch (NumberFormatException e) {
 			if(left.startsWith("\\'") && left.endsWith("\\'")) {
 				cs.typeLeft = 1;
 				cs.valueLeft = left;
 				cs.dataLeft ="varchar";
+				cs.indexLeft = false;
 			} else {
 				cs.typeLeft = 0;
 				String[] tmp_c = left.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				String t = findTableName(tmp_c[0]);
+				String table = new String();
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					String table = null;
+					table = null;
 					String col = tmp_c[0];
 					cs.tableLeft = checkCol(table, col,cs, false);
 					cs.valueLeft = col;
 				} else if(t != null) {	// Table.col or t.col
-					String table = t;
+					table = t;
 					String col = tmp_c[1];
 					cs.tableLeft = checkCol(table, col,cs, false);
 					cs.valueLeft = col;
+				}
+				cs.indexLeft = false;
+				TableList.table_node tn = Main.ct.checktablename(cs.tableLeft);
+				if(Main.ct.checkIndex(tn, left)) {
+					cs.indexLeft = true;
 				}
 			}
 		}
@@ -2296,26 +2304,34 @@ public class Select extends SQLRequest{
 			cs.typeRight = 2;
 			cs.valueRight = right;
 			cs.dataRight ="int";
+			cs.indexRight = true;
 		} catch (NumberFormatException e) {
 			if(right.startsWith("\'") && right.endsWith("\'")) {
 				cs.typeRight = 1;
 				cs.valueRight = right;
 				cs.dataRight = "varchar";
+				cs.indexRight = true;
 			} else {
 				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
 				String t = findTableName(tmp_c[0]);
+				String table = new String();
 
 				if(tmp_c.length == 1) {		// ambiguous variable
-					String table = null;
+					table = null;
 					String col = tmp_c[0];
 					cs.tableRight = checkCol(table, col,cs, true);
 					cs.valueRight = col;
 				} else if(t != null) {	// Table.col or t.col
-					String table = t;
+					table = t;
 					String col = tmp_c[1];
 					cs.tableRight = checkCol(table, col,cs, true);
 					cs.valueRight = col;
+				}
+				cs.indexRight = false;
+				TableList.table_node tn = Main.ct.checktablename(cs.tableRight);
+				if(Main.ct.checkIndex(tn, left)) {
+					cs.indexRight = true;
 				}
 			}
 		}
@@ -2387,7 +2403,150 @@ public class Select extends SQLRequest{
 		return count;
 	}
 	
+	public boolean checkIndex() {
+		for(ConditionStruct cs: this.condition) {
+			if(cs.indexLeft || cs.indexRight) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void doIndexSelect() {
+		ConditionStruct cs1;
+		ConditionStruct cs2;
+		Index in1;
+		Index in2;
+		List<Object> l1 = null;
+		List<Object> l2;
+		
+		switch(this.tableName.size()) {
+			case 1:	// one table
+				switch(this.condition.size()) {
+					case 1:	// one condition which is index
+						cs1 = this.condition.get(0);
+						if(cs1.indexLeft && cs1.typeRight != 0) {
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+						} else if(cs1.indexLeft) {
+							
+						}
+						if(this.tableName.size() == 2) {
+							List<Object> tmp = new ArrayList<Object>();
+							for(Object o: l1) {
+								tmp.add(o);
+								tmp.add(o);
+							}
+						}
+						break;	// end one cond
+					case 2:	// two condition
+						cs1 = this.condition.get(0);
+						cs2 = this.condition.get(1);
+						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
+								cs1.indexLeft) {	// two condition use same col which is index
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+							l2 = getCondResult(in1, cs2);
+							uni_or_inter(l1, l2);
+						} else if(cs1.indexLeft) {	// first condition use index only
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+							twoCond_oneIndex(l1, cs2);
+						} else if(cs2.indexLeft) {	// second condition use index only
+							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
+							l1 = getCondResult(in1, cs2);
+							twoCond_oneIndex(l1, cs1);
+						}						
+						break;	// end two cond
+				}
+				break;	// end one table
+			case 2:	// two table
+				if(this.condition.size() == 2) {
+					
+				}				
+				break;	// end two table
+			default:
+		}
+		// TODO: pick assign column from List<TableList.row_node> l1
+
+	}
+	
+	private List<Object> getCondResult(Index i, ConditionStruct cs) {
+		switch(cs.operator) {
+		case 0:	// not equal
+			return i.btree.getNotEqual(cs.valueRight);
+		case 1:	// smaller
+			return i.btree.getRange(0, cs.valueRight);
+		case 2:	// greater
+			return i.btree.getRange(cs.valueRight, 0);
+		case 3:	// equal
+			return i.btree.get(cs.valueRight);
+		default:
+			return null;
+		}
+	}
+	
+	private void uni_or_inter(List l1, List l2) {
+		switch(this.op) {
+		case 1:	// AND
+			l1.retainAll(l2);
+			break;
+		case 2:	// OR
+			l1.addAll(l2);
+			break;
+		}
+	}
+	private void twoCond_oneIndex(List<Object> l1,ConditionStruct cs2) {
+		int a = Main.ct.checktablename(cs2.tableLeft).getColumnIndex(cs2.valueLeft);
+		
+		switch(this.op) {
+		case 1:	// AND
+			if(cs2.typeRight != 0) {
+				for(Object o: l1) {
+					TableList.row_node rn = (TableList.row_node)o;
+					if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+						continue;
+					} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
+						continue;
+					} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
+						continue;
+					} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+						continue;
+					} else {
+						l1.remove(o);
+					}
+				}
+			} else {
+				// TODO: if comparing with column
+			}
+			break;
+		case 2:	// OR
+			if(cs2.typeRight != 0) {
+				List<TableList.row_node> row_list = Main.ct.return_colList(cs2.tableLeft);
+				List<Object> tmp = new ArrayList<Object>();
+				for(TableList.row_node rn : row_list) {
+					if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
+						tmp.add(rn);
+					} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
+						tmp.add(rn);
+					} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
+						tmp.add(rn);
+					} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+						tmp.add(rn);
+					}
+				}
+				l1.removeAll(tmp);
+				l1.addAll(tmp);
+			} else {
+				
+			}
+			break;
+		}
+	}
+	
 	class ConditionStruct{
+		boolean indexLeft = false;
+		boolean indexRight = false;
 		String dataLeft;
 		String dataRight; 
 		String tableLeft = null;

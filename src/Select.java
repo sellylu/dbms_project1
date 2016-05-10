@@ -2413,12 +2413,12 @@ public class Select extends SQLRequest{
 	}
 	
 	public void doIndexSelect() {
-		ConditionStruct cs1;
-		ConditionStruct cs2;
+		ConditionStruct cs1 = null;
+		ConditionStruct cs2 = null;
 		Index in1;
 		Index in2;
-		List<Object> l1 = null;
-		List<Object> l2;
+		List<TableList.row_node> l1 = null;
+		List<TableList.row_node> l2;
 		
 		switch(this.tableName.size()) {
 			case 1:	// one table
@@ -2453,7 +2453,11 @@ public class Select extends SQLRequest{
 						break;	// end two cond
 				}
 				// TODO: pick assign column from List<TableList.row_node> l1
-
+				int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
+				for(TableList.row_node t : l1){
+					System.out.println(t.data[a]);
+				}
+				
 				break;	// end one table
 			case 2:	// two table
 				switch(this.condition.size()) {
@@ -2468,7 +2472,7 @@ public class Select extends SQLRequest{
 
 	}
 	
-	private List<Object> getCondResult(Index i, ConditionStruct cs) {
+	private List<TableList.row_node> getCondResult(Index i, ConditionStruct cs) {
 		switch(cs.operator) {
 		case 0:	// not equal
 			return i.btree.get_notequal(cs.valueRight);
@@ -2493,7 +2497,7 @@ public class Select extends SQLRequest{
 			break;
 		}
 	}
-	private void twoCond_oneIndex(List<Object> l1,ConditionStruct cs2) {
+	private void twoCond_oneIndex(List<TableList.row_node> l1,ConditionStruct cs2) {
 		int a = Main.ct.checktablename(cs2.tableLeft).getColumnIndex(cs2.valueLeft);
 		
 		switch(this.op) {
@@ -2520,7 +2524,7 @@ public class Select extends SQLRequest{
 		case 2:	// OR
 			if(cs2.typeRight != 0) {
 				List<TableList.row_node> row_list = Main.ct.return_colList(cs2.tableLeft);
-				List<Object> tmp = new ArrayList<Object>();
+				List<TableList.row_node> tmp = new ArrayList<TableList.row_node>();
 				for(TableList.row_node rn : row_list) {
 					if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
 						tmp.add(rn);

@@ -369,7 +369,7 @@ public class TableList {
 	
 	public boolean checkIndex(table_node tablenode,String colName){
 		
-		int t =0 ;
+		int t = 0;
 		for(String c : tablenode.colname){
 			if(c.equalsIgnoreCase(colName)){
 				return tablenode.indexCheck[t];

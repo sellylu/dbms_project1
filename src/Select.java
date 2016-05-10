@@ -2458,6 +2458,14 @@ public class Select extends SQLRequest{
 			case 2:	// two table
 				switch(this.condition.size()) {
 					case 1:	// one condition which is index
+						cs1 = this.condition.get(0);
+						if(cs1.indexLeft && cs1.typeRight != 0) {
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+							
+						} else if(cs1.indexLeft) {
+							// TODO: where compare two column in one table
+						}
 						break;
 					case 2:
 						break;

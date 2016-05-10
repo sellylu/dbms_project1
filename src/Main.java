@@ -42,6 +42,7 @@ public class Main {
 		Parser parser;
 		ct = new TableList();
 		indexlist = new IndexList();
+		long tStart;
 		
 		List<String> remains = new ArrayList<String>();
 		String command;
@@ -77,7 +78,7 @@ public class Main {
 				remains.remove(0);
 			}
 			
-			
+			tStart = System.currentTimeMillis();
 			try {
 				parser = new Parser(command);
 				// get command type in enum
@@ -189,6 +190,7 @@ public class Main {
 				System.out.println("[Error]  " + e.getMessage());
 				e.printStackTrace();
 			}	
+			System.out.println(System.currentTimeMillis() - tStart);
 	
 		}
 	}

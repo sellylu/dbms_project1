@@ -2429,14 +2429,7 @@ public class Select extends SQLRequest{
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
 							l1 = getCondResult(in1, cs1);
 						} else if(cs1.indexLeft) {
-							
-						}
-						if(this.tableName.size() == 2) {
-							List<Object> tmp = new ArrayList<Object>();
-							for(Object o: l1) {
-								tmp.add(o);
-								tmp.add(o);
-							}
+							// TODO: where compare two column in one table
 						}
 						break;	// end one cond
 					case 2:	// two condition
@@ -2459,26 +2452,30 @@ public class Select extends SQLRequest{
 						}						
 						break;	// end two cond
 				}
+				// TODO: pick assign column from List<TableList.row_node> l1
+
 				break;	// end one table
 			case 2:	// two table
-				if(this.condition.size() == 2) {
-					
-				}				
+				switch(this.condition.size()) {
+					case 1:	// one condition which is index
+						break;
+					case 2:
+						break;
+				}
 				break;	// end two table
 			default:
 		}
-		// TODO: pick assign column from List<TableList.row_node> l1
 
 	}
 	
 	private List<Object> getCondResult(Index i, ConditionStruct cs) {
 		switch(cs.operator) {
 		case 0:	// not equal
-			return i.btree.getNotEqual(cs.valueRight);
+			return i.btree.get_notequal(cs.valueRight);
 		case 1:	// smaller
-			return i.btree.getRange(0, cs.valueRight);
+			return i.btree.get_less(cs.valueRight);
 		case 2:	// greater
-			return i.btree.getRange(cs.valueRight, 0);
+			return i.btree.get_bigger(cs.valueRight);
 		case 3:	// equal
 			return i.btree.get(cs.valueRight);
 		default:
@@ -2517,7 +2514,7 @@ public class Select extends SQLRequest{
 					}
 				}
 			} else {
-				// TODO: if comparing with column
+				// TODO: if comparing columns
 			}
 			break;
 		case 2:	// OR
@@ -2538,7 +2535,7 @@ public class Select extends SQLRequest{
 				l1.removeAll(tmp);
 				l1.addAll(tmp);
 			} else {
-				
+				// TODO: if comparing columns
 			}
 			break;
 		}

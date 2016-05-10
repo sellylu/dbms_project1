@@ -96,7 +96,8 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
-                if (eq(key, children[j].key)) return (List) children[j].address;
+                if (eq(key, children[j].key))
+                	return (List) children[j].address;
             }
         }
 

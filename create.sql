@@ -7,6 +7,7 @@ create table tweets(
 );
 
 
+
 import tweets.sql;
 
 create table user1 (
@@ -15,5 +16,6 @@ create table user1 (
 	userLocation varchar(30)
 );
 
+CREATE INDEX uindex on user1(userId);
 
 import user1.sql;

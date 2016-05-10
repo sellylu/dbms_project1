@@ -192,7 +192,7 @@ public class Main {
 				e.printStackTrace();
 
 			} finally {
-				System.out.println("Execution time: " + (System.currentTimeMillis() - tStart));
+				System.out.println("Execution time: " + (System.currentTimeMillis() - tStart) + "ms");
 			}
 
 	

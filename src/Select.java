@@ -2417,8 +2417,8 @@ public class Select extends SQLRequest{
 		ConditionStruct cs2 = null;
 		Index in1;
 		Index in2;
-		List<TableList.row_node> l1 = new ArrayList<TableList.row_node>();
-		List<TableList.row_node> l2 = new ArrayList<TableList.row_node>();
+		List<TableList.row_node> l1 = null;
+		List<TableList.row_node> l2 = null;
 		String[] cn;
 		
 		switch(this.tableName.size()) {
@@ -2428,7 +2428,7 @@ public class Select extends SQLRequest{
 						cs1 = this.condition.get(0);
 						if(cs1.indexLeft && cs1.typeRight != 0) {
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
 						} else if(cs1.indexLeft) {
 							// TODO: where compare two column in one table
 						}
@@ -2439,16 +2439,16 @@ public class Select extends SQLRequest{
 						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
 								cs1.indexLeft) {	// two condition use same col which is index
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
-							l2 = getCondResult(in1, cs2);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
 							uni_or_inter(l1, l2);
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
 							twoCond_oneIndex(l1, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
-							l1 = getCondResult(in1, cs2);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
 							twoCond_oneIndex(l1, cs1);
 						}						
 						break;	// end two cond
@@ -2527,16 +2527,16 @@ public class Select extends SQLRequest{
 						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
 								cs1.indexLeft) {	// two condition use same col which is index
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
-							l2 = getCondResult(in1, cs2);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
 							uni_or_inter(l1, l2);
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
 							twoCond_oneIndex(l1, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
-							l1 = getCondResult(in1, cs2);
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
 							twoCond_oneIndex(l1, cs1);
 						}	
 						
@@ -2625,9 +2625,14 @@ public class Select extends SQLRequest{
 							}
 						}else if(type.equals("varchar")){
 							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
-							continue;
+								continue;
+							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								continue;
+							} else {
+								l1.remove(o);
 							}
 						}
+						break;
 					case 1:
 						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
 							continue;
@@ -2668,46 +2673,41 @@ public class Select extends SQLRequest{
 						String type = cs2.dataLeft;
 						if(type.equals("int")){
 							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
-								continue;
+								tmp.add(rn);
 							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn.data[b]) && cs2.operator == 1) {
-								continue;
+								tmp.add(rn);
 							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn.data[b]) && cs2.operator == 2) {
-								continue;
+								tmp.add(rn);
 							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
-								continue;
-							} else {
-								l1.remove(tmp);
+								tmp.add(rn);
 							}
-						}else if(type.equals("varchar")){
+						} else if(type.equals("varchar")){
 							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
-							continue;
+								tmp.add(rn);
+							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								tmp.add(rn);
 							}
 						}
+						break;
 					case 1:
 						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
-							continue;
-						}else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
-							continue;
-						} else {
-							l1.remove(tmp);
+							tmp.add(rn);
+						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
+							tmp.add(rn);
 						}
 						break;
 					case 2:
 					
 						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
-							continue;
+							tmp.add(rn);
 						} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
-							continue;
+							tmp.add(rn);
 						} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
-							continue;
+							tmp.add(rn);
 						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
-							continue;
-						} else {
-							l1.remove(tmp);
+							tmp.add(rn);
 						}
 						break;
-						
-					
 					}
 					
 				}

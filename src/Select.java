@@ -2304,13 +2304,13 @@ public class Select extends SQLRequest{
 			cs.typeRight = 2;
 			cs.valueRight = right;
 			cs.dataRight ="int";
-			cs.indexRight = true;
+			cs.indexRight = false;
 		} catch (NumberFormatException e) {
 			if(right.startsWith("\'") && right.endsWith("\'")) {
 				cs.typeRight = 1;
 				cs.valueRight = right;
 				cs.dataRight = "varchar";
-				cs.indexRight = true;
+				cs.indexRight = false;
 			} else {
 				cs.typeRight = 0;
 				String[] tmp_c = right.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
@@ -2417,8 +2417,9 @@ public class Select extends SQLRequest{
 		ConditionStruct cs2 = null;
 		Index in1;
 		Index in2;
-		List<TableList.row_node> l1 = null;
-		List<TableList.row_node> l2;
+		List<TableList.row_node> l1 = new ArrayList<TableList.row_node>();
+		List<TableList.row_node> l2 = new ArrayList<TableList.row_node>();
+		String[] cn;
 		
 		switch(this.tableName.size()) {
 			case 1:	// one table
@@ -2454,7 +2455,7 @@ public class Select extends SQLRequest{
 				}
 				// TODO: pick assign column from List<TableList.row_node> l1
 				TableList.table_node tn = Main.ct.checktablename(cs1.tableLeft);
-				String[] cn = Main.ct.getColName(cs1.tableLeft);
+				cn = Main.ct.getColName(cs1.tableLeft);
 				String[] type= Main.ct.getDataType(cs1.tableLeft);
 
 				//int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
@@ -2470,27 +2471,101 @@ public class Select extends SQLRequest{
 							count = innerCheck(t.data[a], count, type[a]);
 						}
 					}
-					if(this.aggr != 1)
-						System.out.print(count);
-					System.out.println();
+					if(this.aggr == 0)
+						System.out.println();
 				}
+				if(this.aggr != 0)
+					System.out.println(count);
 				
 				break;	// end one table
 			case 2:	// two table
+				
+				List<String> cn1 = Arrays.asList(Main.ct.getColName(this.tableName.get(0).get(1)));
+				List<String> cn2 = Arrays.asList(Main.ct.getColName(this.tableName.get(1).get(1)));
+				List<Integer> resultColIndex1 = new ArrayList<Integer>();
+				List<Integer> resultColIndex2 = new ArrayList<Integer>();
+				
+				for(List<String> ls: this.colName){
+					if(!ls.get(1).equals("*")) {
+						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(1))) {
+							resultColIndex1.add(cn1.indexOf(ls.get(1)));
+						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(1))) {
+							resultColIndex2.add(cn2.indexOf(ls.get(1)));
+						}
+					} else {
+						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(1))) {
+							for(int i = 0; i < cn1.size(); i++) {
+								resultColIndex1.add(i);
+							}
+						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(1))) {
+							for(int i = 0; i < cn2.size(); i++) {
+								resultColIndex1.add(i);
+							}
+						}
+					}
+				}
+				
 				switch(this.condition.size()) {
 					case 1:	// one condition which is index
 						cs1 = this.condition.get(0);
 						if(cs1.indexLeft && cs1.typeRight != 0) {
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = getCondResult(in1, cs1);
-							
+							List<TableList.row_node> tmp = getCondResult(in1, cs1);
+							for(TableList.row_node rn: tmp) {
+								List<TableList.row_node> lr = Main.ct.return_colList(cs1.tableRight);
+								for(int i = 0; i < lr.size(); i++)
+									l1.add(rn);
+								l2.addAll(lr);
+							}
 						} else if(cs1.indexLeft) {
 							// TODO: where compare two column in one table
 						}
 						break;
 					case 2:
+						cs1 = this.condition.get(0);
+						cs2 = this.condition.get(1);
+						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
+								cs1.indexLeft) {	// two condition use same col which is index
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+							l2 = getCondResult(in1, cs2);
+							uni_or_inter(l1, l2);
+						} else if(cs1.indexLeft) {	// first condition use index only
+							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+							l1 = getCondResult(in1, cs1);
+							twoCond_oneIndex(l1, cs2);
+						} else if(cs2.indexLeft) {	// second condition use index only
+							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
+							l1 = getCondResult(in1, cs2);
+							twoCond_oneIndex(l1, cs1);
+						}	
+						
+						
 						break;
 				}
+				cn = Main.ct.getColName(cs1.tableLeft);
+				String[] type1 = Main.ct.getDataType(this.tableName.get(0).get(1));
+				String[] type2 = Main.ct.getDataType(this.tableName.get(1).get(1));
+
+				//int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
+				int count2 = 0;
+				int j = 0;
+				for(TableList.row_node t : l1) {
+					for(Integer id: resultColIndex1) {
+						count2 = innerCheck(t.data[id], count2, type1[id]);
+					}
+					for(Integer id: resultColIndex2) {
+						count2 = innerCheck(l2.get(j).data[id], count2, type2[id]);
+					}
+					if(this.aggr == 0)
+						System.out.println();
+					j++;
+				}
+				if(this.aggr == 1)
+					System.out.println(count2/resultColIndex1.size());
+				if(this.aggr == 2)
+					System.out.println(count2);
+				
 				break;	// end two table
 			default:
 		}

@@ -12,7 +12,7 @@ public class IndexList {
 	
 	public Boolean checkIndex(String tablename,String colname){
 		for(Index i : list){
-			if(i.tablename.equals(tablename) && i.colname.equals(colname)){
+			if(i.tablename.equalsIgnoreCase(tablename) && i.colname.equalsIgnoreCase(colname)){
 				return true;
 			}
 		}
@@ -21,7 +21,7 @@ public class IndexList {
 	
 	public Index getIndex(String tablename,String colname){
 		for(Index i : list){
-			if(i.tablename.equals(tablename) && i.colname.equals(colname)){
+			if(i.tablename.equalsIgnoreCase(tablename) && i.colname.equalsIgnoreCase(colname)){
 				return i;
 			}
 		}

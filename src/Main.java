@@ -189,8 +189,9 @@ public class Main {
 				// TODO Auto-generated catch block
 				System.out.println("[Error]  " + e.getMessage());
 				e.printStackTrace();
-			}	
-			System.out.println("Execution time: " + System.currentTimeMillis() - tStart);
+			} finally {
+				System.out.println("Execution time: " + (System.currentTimeMillis() - tStart));
+			}
 	
 		}
 	}

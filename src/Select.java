@@ -2453,9 +2453,26 @@ public class Select extends SQLRequest{
 						break;	// end two cond
 				}
 				// TODO: pick assign column from List<TableList.row_node> l1
-				int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
-				for(TableList.row_node t : l1){
-					System.out.println(t.data[a]);
+				TableList.table_node tn = Main.ct.checktablename(cs1.tableLeft);
+				String[] cn = Main.ct.getColName(cs1.tableLeft);
+				String[] type= Main.ct.getDataType(cs1.tableLeft);
+
+				//int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
+				int count = 0;
+				for(TableList.row_node t : l1) {
+					for(List<String> ls: this.colName) {
+						if(ls.get(1).equals("*")) {
+							for(int i = 0; i < cn.length; i++) {
+								count = innerCheck(t.data[i], count, type[i]);
+							}
+						} else {
+							int a = tn.getColumnIndex(ls.get(1));
+							count = innerCheck(t.data[a], count, type[a]);
+						}
+					}
+					if(this.aggr != 1)
+						System.out.print(count);
+					System.out.println();
 				}
 				
 				break;	// end one table

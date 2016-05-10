@@ -190,7 +190,7 @@ public class Main {
 				System.out.println("[Error]  " + e.getMessage());
 				e.printStackTrace();
 			}	
-			System.out.println(System.currentTimeMillis() - tStart);
+			System.out.println("Execution time: " + System.currentTimeMillis() - tStart);
 	
 		}
 	}

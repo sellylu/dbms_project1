@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class BTree<Key extends Comparable<Key>, Value>  {
     // max children per B-tree node = M-1
@@ -25,11 +27,15 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     private static class Entry {
         private Comparable key;
         private Object val;
+        private List address;
         private Node next;     // helper field to iterate over array entries
         public Entry(Comparable key, Object val, Node next) {
             this.key  = key;
             this.val  = val;
             this.next = next;
+            address = new ArrayList();
+            address.add(val);
+            
         }
     }
 
@@ -74,18 +80,24 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      *         and <tt>null</tt> if the key is not in the symbol table
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
+    
+    
+    // equal
     public List get(Key key) {
         if (key == null) throw new NullPointerException("key must not be null");
         return search(root, key, height);
     }
-
+    
+    
+    
+    
     private List search(Node x, Key key, int ht) {
         Entry[] children = x.children;
 
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
-                if (eq(key, children[j].key)) return (List) children[j].val;
+                if (eq(key, children[j].key)) return (List) children[j].address;
             }
         }
 
@@ -98,7 +110,158 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         }
         return null;
     }
+    
+    public List get_notequal(Key key) {
+        if (key == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        search_notequal(store,root, key, height);
+        return store;
+    }
+    
+    private List search_notequal(List store,Node x, Key key, int ht) {
+        Entry[] children = x.children;
 
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+                if (!eq(key, children[j].key))  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || less(key, children[j+1].key))
+                    search_notequal(store,children[j].next, key, ht-1);
+            }
+        }
+        return null;
+    }
+    
+    
+    
+    public List get_bigger(Key key) {
+        if (key == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        search_bigger(store,root, key, height);
+        return store;
+    }
+    
+    private List search_bigger(List store,Node x, Key key, int ht) {
+    	//System.out.println("ht = " + ht);
+        Entry[] children = x.children;
+        
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+            	
+                if (bigger(key, children[j].key))  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+            	System.out.println("bigger " + children[j].key);
+                if (j+1 == x.m || bigger(key, children[j].key) ||bigger(key, children[j+1].key))
+                    search_bigger(store,children[j].next, key, ht-1);
+            }
+        }
+        return null;
+    }
+    
+    public List get_less(Key key) {
+        if (key == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        search_less(store,root, key, height);
+        return store;
+    }
+    
+    private List search_less(List store,Node x, Key key, int ht) {
+        Entry[] children = x.children;
+        
+
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+            	
+                if (less(key, children[j].key))  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || less(key, children[j+1].key))
+                    search_less(store,children[j].next, key, ht-1);
+            }
+        }
+        return null;
+    }
+    
+    public List get_range(Key key1,Key key2) {
+        if (key1 == null) throw new NullPointerException("key must not be null");
+        if (key2 == null) throw new NullPointerException("key must not be null");
+        List store = new ArrayList();
+        search_range(store,root, key1, key2, height);
+        return store;
+    }
+    
+    private List search_range(List store,Node x, Key key1, Key key2, int ht) {
+        Entry[] children = x.children;
+
+        // external node
+        if (ht == 0) {
+            for (int j = 0; j < x.m; j++) {
+                if (bigger(key1, children[j].key) && less(key2,children[j].key) )  {
+                	for(Object i : children[j].address){
+                		store.add(i);
+                	}
+                };
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || (bigger(key1, children[j].key)||(bigger(key1, children[j+1].key)) && less(key2,children[j+1].key)))
+                    search_range(store,children[j].next, key1,key2, ht-1);
+            }
+        }
+        return null;
+    }
+    
+    private Entry search_entry(Node x,Key key,int height){
+    	Entry[] children = x.children;
+
+        // external node
+        if (height == 0) {
+            for (int j = 0; j < x.m; j++) {
+                if (eq(key, children[j].key)) return children[j];
+            }
+        }
+
+        // internal node
+        else {
+            for (int j = 0; j < x.m; j++) {
+                if (j+1 == x.m || less(key, children[j+1].key))
+                    return search_entry(children[j].next, key, height-1);
+            }
+        }
+        return null;
+    }
 
     /**
      * Inserts the key-value pair into the symbol table, overwriting the old value
@@ -109,7 +272,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      * @param  val the value
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
-    public void put(Key key, List val) {
+    public void put(Key key, int val) {
         if (key == null) throw new NullPointerException("key must not be null");
         Node u = insert(root, key, val, height); 
         N++;
@@ -123,37 +286,43 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         height++;
     }
 
-    private Node insert(Node h, Key key, List val, int ht) {
+    private Node insert(Node h, Key key, int val, int ht) {
         int j;
-        Entry t = new Entry(key, val, null);
-
-        // external node
-        if (ht == 0) {
-            for (j = 0; j < h.m; j++) {
-                if (less(key, h.children[j].key)) break;
-            }
+        Entry tmp_entry;
+        if((tmp_entry = search_entry(root,key,ht)) != null){
+        	tmp_entry.address.add(val);
+        	return null;
+        }else{
+	        Entry t = new Entry(key, val, null);
+	
+	        // external node
+	        if (ht == 0) {
+	            for (j = 0; j < h.m; j++) {
+	                if (less(key, h.children[j].key)) break;
+	            }
+	        }
+	
+	        // internal node
+	        else {
+	            for (j = 0; j < h.m; j++) {
+	                if ((j+1 == h.m) || less(key, h.children[j+1].key)) {
+	                    Node u = insert(h.children[j++].next, key, val, ht-1);
+	                    if (u == null) return null;
+	                    t.key = u.children[0].key;
+	                    t.next = u;
+	                    break;
+	                }
+	            }
+	        }
+	
+	        for (int i = h.m; i > j; i--)
+	            h.children[i] = h.children[i-1];
+	        h.children[j] = t;
+	        h.m++;
+	        if (h.m < M) return null;
+	        else         return split(h);
+        	}
         }
-
-        // internal node
-        else {
-            for (j = 0; j < h.m; j++) {
-                if ((j+1 == h.m) || less(key, h.children[j+1].key)) {
-                    Node u = insert(h.children[j++].next, key, val, ht-1);
-                    if (u == null) return null;
-                    t.key = u.children[0].key;
-                    t.next = u;
-                    break;
-                }
-            }
-        }
-
-        for (int i = h.m; i > j; i--)
-            h.children[i] = h.children[i-1];
-        h.children[j] = t;
-        h.m++;
-        if (h.m < M) return null;
-        else         return split(h);
-    }
 
     // split node in half
     private Node split(Node h) {
@@ -193,8 +362,13 @@ public class BTree<Key extends Comparable<Key>, Value>  {
 
 
     // comparison functions - make Comparable instead of Key to avoid casts
-    private boolean less(Comparable k1, Comparable k2) {
+    private boolean bigger(Comparable k1, Comparable k2) {
         return k1.compareTo(k2) < 0;
+        
+    }
+    
+    private boolean less(Comparable k1, Comparable k2) {
+        return k1.compareTo(k2) > 0;
     }
 
     private boolean eq(Comparable k1, Comparable k2) {
@@ -202,18 +376,24 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     }
 
 
-    /* 
+    /*
     public static void main(String[] args) {
-        Main<String, List> st = new Main<String, List>();
-        List a = new ArrayList();
-        a.add("a");
-        a.add("b");
+        Main<Integer, Integer> st = new Main<Integer, Integer>();
         
-        st.put("www.cs.princeton.edu", a);
+        
+        //st.put(500, 1000);
+        for(int i =1;i<100;i++){
+        	st.put(i,i);
+        }
 
 
-        List c = st.get("www.cs.princeton.edu");
-        System.out.println(c.get(1));
+       //List c = st.get_less(62);
+        List d = st.get_bigger(39);
+        List e = st.get_range(51,99);
+        for(Object i:e){
+        	System.out.println(i);
+        }
+        
         
 
     }*/

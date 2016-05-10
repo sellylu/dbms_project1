@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class BTree<Key extends Comparable<Key>, Value>  {
     // max children per B-tree node = M-1
     // (must be even and greater than 2)
@@ -72,18 +74,18 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      *         and <tt>null</tt> if the key is not in the symbol table
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
-    public Value get(Key key) {
+    public List get(Key key) {
         if (key == null) throw new NullPointerException("key must not be null");
         return search(root, key, height);
     }
 
-    private Value search(Node x, Key key, int ht) {
+    private List search(Node x, Key key, int ht) {
         Entry[] children = x.children;
 
         // external node
         if (ht == 0) {
             for (int j = 0; j < x.m; j++) {
-                if (eq(key, children[j].key)) return (Value) children[j].val;
+                if (eq(key, children[j].key)) return (List) children[j].val;
             }
         }
 
@@ -107,7 +109,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      * @param  val the value
      * @throws NullPointerException if <tt>key</tt> is <tt>null</tt>
      */
-    public void put(Key key, Value val) {
+    public void put(Key key, List val) {
         if (key == null) throw new NullPointerException("key must not be null");
         Node u = insert(root, key, val, height); 
         N++;
@@ -121,7 +123,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         height++;
     }
 
-    private Node insert(Node h, Key key, Value val, int ht) {
+    private Node insert(Node h, Key key, List val, int ht) {
         int j;
         Entry t = new Entry(key, val, null);
 
@@ -200,43 +202,19 @@ public class BTree<Key extends Comparable<Key>, Value>  {
     }
 
 
-    /**
-     * Unit tests the <tt>BTree</tt> data type.
-     
+    /* 
     public static void main(String[] args) {
-        BTree<String, String> st = new BTree<String, String>();
-
-        st.put("www.cs.princeton.edu", "128.112.136.12");
-        st.put("www.cs.princeton.edu", "128.112.136.11");
-        st.put("www.princeton.edu",    "128.112.128.15");
-        st.put("www.yale.edu",         "130.132.143.21");
-        st.put("www.simpsons.com",     "209.052.165.60");
-        st.put("www.apple.com",        "17.112.152.32");
-        st.put("www.amazon.com",       "207.171.182.16");
-        st.put("www.ebay.com",         "66.135.192.87");
-        st.put("www.cnn.com",          "64.236.16.20");
-        st.put("www.google.com",       "216.239.41.99");
-        st.put("www.nytimes.com",      "199.239.136.200");
-        st.put("www.microsoft.com",    "207.126.99.140");
-        st.put("www.dell.com",         "143.166.224.230");
-        st.put("www.slashdot.org",     "66.35.250.151");
-        st.put("www.espn.com",         "199.181.135.201");
-        st.put("www.weather.com",      "63.111.66.11");
-        st.put("www.yahoo.com",        "216.109.118.65");
+        Main<String, List> st = new Main<String, List>();
+        List a = new ArrayList();
+        a.add("a");
+        a.add("b");
+        
+        st.put("www.cs.princeton.edu", a);
 
 
-        StdOut.println("cs.princeton.edu:  " + st.get("www.cs.princeton.edu"));
-        StdOut.println("hardvardsucks.com: " + st.get("www.harvardsucks.com"));
-        StdOut.println("simpsons.com:      " + st.get("www.simpsons.com"));
-        StdOut.println("apple.com:         " + st.get("www.apple.com"));
-        StdOut.println("ebay.com:          " + st.get("www.ebay.com"));
-        StdOut.println("dell.com:          " + st.get("www.dell.com"));
-        StdOut.println();
+        List c = st.get("www.cs.princeton.edu");
+        System.out.println(c.get(1));
+        
 
-        StdOut.println("size:    " + st.size());
-        StdOut.println("height:  " + st.height());
-        StdOut.println(st);
-        StdOut.println();
     }*/
-
 }

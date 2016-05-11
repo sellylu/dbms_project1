@@ -2433,7 +2433,7 @@ public class Select extends SQLRequest{
 						cs1 = this.condition.get(0);
 						if(cs1.indexLeft && cs1.typeRight != 0) {
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
 						} else if(cs1.indexLeft) {
 							// TODO: where compare two column in one table
 						}
@@ -2441,19 +2441,26 @@ public class Select extends SQLRequest{
 					case 2:	// two condition
 						cs1 = this.condition.get(0);
 						cs2 = this.condition.get(1);
-						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
+						if (cs1.indexLeft && cs1.typeRight == 0) {
+							int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
+							List<TableList.row_node> rn = Main.ct.return_colList(cs1.tableLeft);
+							for(TableList.row_node r: rn) {
+								in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+								l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, r.data[a]));
+							}
+						} else if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
 								cs1.indexLeft) {	// two condition use same col which is index
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
-							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
+							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2, null));
 							uni_or_inter(l1, l2);
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
 							twoCond_oneIndex(l1,null, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
+							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2, null));
 							twoCond_oneIndex(l1,null, cs1);
 						}						
 						break;	// end two cond
@@ -2499,10 +2506,17 @@ public class Select extends SQLRequest{
 				for(List<String> ls: this.colName){
 					if(!ls.get(1).equals("*")) {
 						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(0))) {
-							resultColIndex1.add(cn1.indexOf(ls.get(1)));
+							for(int i = 0; i < cn1.size(); i++)
+								if(cn1.get(i).equalsIgnoreCase(ls.get(1))) {
+									resultColIndex1.add(i);
+									break;
+								}
 						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(0))) {
-							int t = cn2.indexOf(ls.get(1));
-							resultColIndex2.add(t);
+							for(int i = 0; i < cn1.size(); i++)
+								if(cn2.get(i).equalsIgnoreCase(ls.get(1))) {
+									resultColIndex2.add(i);
+									break;
+								}
 						}
 					} else {
 						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(0))) {
@@ -2522,7 +2536,7 @@ public class Select extends SQLRequest{
 						cs1 = this.condition.get(0);
 						if(cs1.indexLeft && cs1.typeRight != 0) {
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
 							for(TableList.row_node rn: tmp) {
 								String tb = new String();
 								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
@@ -2542,11 +2556,31 @@ public class Select extends SQLRequest{
 					case 2:
 						cs1 = this.condition.get(0);
 						cs2 = this.condition.get(1);
-						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
+						if (cs1.indexLeft && cs1.typeRight == 0) {
+							int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
+							List<TableList.row_node> rn = Main.ct.return_colList(cs1.tableLeft);
+							l2 = new ArrayList<TableList.row_node>();
+							for(TableList.row_node r: rn) {
+								in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
+								
+								String tb = new String();
+								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
+									tb = this.tableName.get(1).get(0);
+								} else {
+									tb = this.tableName.get(0).get(0);
+								}
+								List<TableList.row_node> re = getCondResult(in1, cs1, r.data[a]);
+								l1.addAll(re);
+								for(int i = 0; i < re.size(); i++) {
+									l2.add(r);
+								}
+							}
+							twoCond_oneIndex(l1, l2, cs2);
+						} else if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
 								cs1.indexLeft) {	// two condition use same col which is index
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
-							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
+							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2, null));
 							uni_or_inter(tmp, l2);
 							l2 = new ArrayList<TableList.row_node>();
 							for(TableList.row_node rn: tmp) {
@@ -2564,7 +2598,7 @@ public class Select extends SQLRequest{
 							
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1, null));
 							for(TableList.row_node rn: tmp) {
 								String tb = new String();
 								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
@@ -2580,7 +2614,7 @@ public class Select extends SQLRequest{
 							twoCond_oneIndex(l1, l2, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
-							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs2, null));
 							for(TableList.row_node rn: tmp) {
 								String tb = new String();
 								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
@@ -2634,8 +2668,13 @@ public class Select extends SQLRequest{
 
 	}
 	
-	private List<TableList.row_node> getCondResult(Index i, ConditionStruct cs) {
-		Integer integer = new Integer(cs.valueRight);
+	private List<TableList.row_node> getCondResult(Index i, ConditionStruct cs, String s) {
+		Integer integer;
+		if(cs.typeRight != 0)
+			integer = new Integer(cs.valueRight);
+		else
+			integer = Integer.parseInt(s);
+		
 		switch(cs.operator) {
 		
 		case 0:	// not equal
@@ -2650,7 +2689,7 @@ public class Select extends SQLRequest{
 			return new ArrayList<TableList.row_node>();
 		}
 	}
-	
+		
 	private void uni_or_inter(List l1, List l2) {
 		switch(this.op) {
 		case 1:	// AND
@@ -2668,7 +2707,6 @@ public class Select extends SQLRequest{
 		switch(this.op) {
 		case 1:	// AND
 			List<TableList.row_node> lr = new ArrayList<TableList.row_node>(l1);
-			i = 0;
 				for(Object o: lr) {
 					TableList.row_node rn1 = (TableList.row_node)o;
 					TableList.row_node rn2 = l2.get(j);
@@ -2698,8 +2736,9 @@ public class Select extends SQLRequest{
 							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								continue;
 							} else {
+								int ii = l1.indexOf(o);
 								l1.remove(o);
-								l2.remove(i);
+								l2.remove(ii);
 							}
 						}else if(type.equals("varchar")){
 							if(!rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 0) {
@@ -2707,8 +2746,9 @@ public class Select extends SQLRequest{
 							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								continue;
 							} else {
+								int ii = l1.indexOf(o);
 								l1.remove(o);
-								l2.remove(i);
+								l2.remove(ii);
 							}
 						}
 						break;
@@ -2718,8 +2758,9 @@ public class Select extends SQLRequest{
 						}else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
 							continue;
 						} else {
+							int ii = l1.indexOf(o);
 							l1.remove(o);
-							l2.remove(i);
+							l2.remove(ii);
 						}
 						break;
 					case 2:
@@ -2733,14 +2774,14 @@ public class Select extends SQLRequest{
 						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
 							continue;
 						} else {
+							int ii = l1.indexOf(o);
 							l1.remove(o);
-							l2.remove(i);
+							l2.remove(ii);
 						}
 						break;
 						
 					
 					}
-					i++;	
 				}
 			break;
 		case 2:	// OR

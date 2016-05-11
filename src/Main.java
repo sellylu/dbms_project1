@@ -192,7 +192,7 @@ public class Main {
 				e.printStackTrace();
 
 			} finally {
-				//System.out.println("Execution time: " + ((System.nanoTime() - tStart)/1000) + "us");
+				System.out.println("Execution time: " + ((System.nanoTime() - tStart)/1000000.0) + "ms");
 			}
 
 	

@@ -108,7 +108,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
                     return search(children[j].next, key, ht-1);
             }
         }
-        return null;
+        return new ArrayList();
     }
     
     public List get_notequal(Key key) {

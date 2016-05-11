@@ -78,7 +78,7 @@ public class Main {
 				remains.remove(0);
 			}
 			
-			tStart = System.currentTimeMillis();
+			tStart = System.nanoTime();
 			try {
 				parser = new Parser(command);
 				// get command type in enum
@@ -158,9 +158,9 @@ public class Main {
 					case Select:
 						Select s = (Select)parser.r;
 						
-						if(s.checkIndex()) {
+						if(ct.checkColInTable(s.tableName,s.colName) && s.checkIndex()) {
 							s.doIndexSelect();
-						} else if(ct.checkColInTable(s.tableName,s.colName) == true){
+						} else if(ct.checkColInTable(s.tableName,s.colName)){
 							s.doSelectFunction(ct);
 							
 						} else {
@@ -192,7 +192,7 @@ public class Main {
 				e.printStackTrace();
 
 			} finally {
-				System.out.println("Execution time: " + (System.currentTimeMillis() - tStart) + "ms");
+				//System.out.println("Execution time: " + ((System.nanoTime() - tStart)/1000) + "us");
 			}
 
 	

@@ -67,7 +67,7 @@ public class Select extends SQLRequest{
 		}
 	}
 	
-	private void parseAggr(String[] col) {
+	private void parseAggr(String[] col) throws Exception {
 		int i = 0;
 		for(String c: col) {
 			String tmp = new String();
@@ -78,9 +78,45 @@ public class Select extends SQLRequest{
 				aggr = 2;
 				tmp = c.split("\\(")[1].split("\\)")[0];
 			}
+			
+			if(this.tableName.size() > 1 && tmp.equals("*"))
+				throw new Exception("Syntax Error: no table name specified");
+			
+			
+			String[] tmp_c = tmp.split("\\.");	// table.col	tmp_c[0]=>table		tmp_c[1]=>col
+			String t = findTableName(tmp_c[0]);
+			String table = new String();
+			String co = new String();
+
+			if(tmp_c.length == 1) {		// ambiguous variable
+				co = tmp_c[0];
+				boolean conflict = true;
+				if(!co.equals("*")) {
+					for(List<String> tn : this.tableName){
+						if(Main.ct.ifExistCol(tn.get(0), co) == true){
+							table = tn.get(0);
+							conflict &= true;
+						} else {
+							conflict &= false;
+						}
+					}
+					if(conflict && this.tableName.size() > 1) {
+						throw new Exception("Column name conflicts.");
+					}
+				}
+			} else if(t != null) {	// Table.col or t.col
+				table = t;
+				co = tmp_c[1];
+				if(!co.equals("*")) {
+					if(!Main.ct.ifExistCol(table,co)) {
+						throw new Exception("Column name not found.");
+					}
+				}
+			}
+			
 			this.colName.add(new ArrayList<String>());
-			this.colName.get(i).add(this.tableName.get(0).get(0));
-			this.colName.get(i).add(tmp);
+			this.colName.get(i).add(table);
+			this.colName.get(i).add(co);
 			i++;
 		}
 	}
@@ -182,27 +218,24 @@ public class Select extends SQLRequest{
 						//from table
 						count = 0;
 						for(TableList.row_node tmp_lr : tn0_allRow) {
-							int i = 0;
 							for(int a : indexoftargetcol_onetable) {
 								switch(this.aggr) {
 								case 0:
-									System.out.print(tmp_lr.data[a] + "  ");
+									System.out.printf("%20s",tmp_lr.data[a]);
 									break;
 								case 1:
 									if(tmp_lr.data[a] != null)
 										count++;
 									break;
 								case 2:
-									int tmp = Integer.parseInt(tmp_lr.data[a]);
-									if(table0datatype[i].equals("int")) {
-										count += tmp;
+									if(table0datatype[a].equals("int")) {
+										count += Integer.parseInt(tmp_lr.data[a]);;
 									}
-									i++;
 									break;
 								}
 							}
 							if(this.aggr == 0)
-								System.out.print("\n");
+								System.out.println();
 						}
 						if(this.aggr == 1)
 							System.out.println(count/indexoftargetcol_onetable.size());
@@ -231,13 +264,11 @@ public class Select extends SQLRequest{
 								}
 								count = 0;
 								for(TableList.row_node tmp_lr : tn0_allRow){
-									int i = 0;
 									for(int a:indexoftargetcol_onetable){
-										count = checkAggr(tmp_lr.data[targetindex0], tmp_lr.data[targetindex1], tmp_lr.data[a], table0datatype[i], count, condition0.operator, 1);
-										i++;
+										count = checkAggr(tmp_lr.data[targetindex0], tmp_lr.data[targetindex1], tmp_lr.data[a], table0datatype[a], count, condition0.operator, 1);
 									}
 									if(this.aggr == 0)
-										System.out.print("\n");
+										System.out.println();
 								}
 								if(this.aggr == 1)
 									System.out.println(count/indexoftargetcol_onetable.size());
@@ -256,13 +287,11 @@ public class Select extends SQLRequest{
 						 		}
 								count = 0;
 								for(TableList.row_node tmp_lr : tn0_allRow){
-									int i = 0;
 						 			for(int a:indexoftargetcol_onetable){
-										count = checkAggr(tmp_lr.data[targetindex0], condition0.valueRight, tmp_lr.data[a], table0datatype[i], count, condition0.operator, condition0.typeRight-1);
-										i++;
+										count = checkAggr(tmp_lr.data[targetindex0], condition0.valueRight, tmp_lr.data[a], table0datatype[a], count, condition0.operator, condition0.typeRight-1);
 						 			}
 									if(this.aggr == 0)
-										System.out.print("\n");
+										System.out.println();
 								}
 								if(this.aggr == 1)
 									System.out.println(count/indexoftargetcol_onetable.size());
@@ -309,7 +338,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){
 															if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -330,7 +359,7 @@ public class Select extends SQLRequest{
 									 					for(int a:indexoftargetcol_onetable){
 									 						if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -364,7 +393,7 @@ public class Select extends SQLRequest{
 											 			for(int a:indexoftargetcol_onetable){
 											 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -384,7 +413,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){
 															if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -420,7 +449,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){				
 															if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -440,7 +469,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){
 															if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit=1;
 															}else{
 																//checkList0.add(0);
@@ -460,7 +489,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){
 															if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -480,7 +509,7 @@ public class Select extends SQLRequest{
 														for(int a:indexoftargetcol_onetable){
 															if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight)){
 																//checkList0.add(1);
-																//System.out.print(tmp_lr.data[a] + "  ");
+																//System.out.printf("%20s", tmp_lr.data[a]);
 																doit =1;
 															}else{
 																//checkList0.add(0);
@@ -528,7 +557,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){
 														if(!tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit= 1;
 														}else{
 															//checkList1.add(0);
@@ -548,7 +577,7 @@ public class Select extends SQLRequest{
 								 					for(int a:indexoftargetcol_onetable){
 								 						if(tmp_lr.data[targetindex2].equalsIgnoreCase(tmp_lr.data[targetindex3])){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 														}else{
 															//checkList1.add(0);
@@ -581,7 +610,7 @@ public class Select extends SQLRequest{
 										 			for(int a:indexoftargetcol_onetable){
 										 				if(!tmp_lr.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 														}else{
 															//checkList1.add(0);
@@ -600,7 +629,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){
 														if(tmp_lr.data[targetindex2].equalsIgnoreCase(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 															
 														}else{
@@ -636,7 +665,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){				
 														if(Integer.parseInt(tmp_lr.data[targetindex2]) != Integer.parseInt(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 														}else{
 															//checkList1.add(0);
@@ -655,7 +684,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){
 														if(Integer.parseInt(tmp_lr.data[targetindex2]) < Integer.parseInt(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 															
 														}else{
@@ -676,7 +705,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){
 														if(Integer.parseInt(tmp_lr.data[targetindex2]) > Integer.parseInt(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 															
 														}else{
@@ -696,7 +725,7 @@ public class Select extends SQLRequest{
 													for(int a:indexoftargetcol_onetable){
 														if(Integer.parseInt(tmp_lr.data[targetindex2]) == Integer.parseInt(condition1.valueRight)){
 															//checkList1.add(1);
-															//System.out.print(tmp_lr.data[a] + "  ");
+															//System.out.printf("%20s", tmp_lr.data[a]);
 															doit =1;
 														}else{
 															//checkList1.add(0);
@@ -726,10 +755,10 @@ public class Select extends SQLRequest{
 											count++;
 											for(int a:indexoftargetcol_onetable){
 												if(this.aggr == 0) {
-													System.out.print(tmp_lr.data[a] + "  ");
+													System.out.printf("%20s", tmp_lr.data[a]);
 												} else if(this.aggr == 2) {
-													int tmp = Integer.parseInt(tmp_lr.data[a]);
-													sum += tmp;
+													if(table0datatype[a].equals("int"))
+														sum += Integer.parseInt(tmp_lr.data[a]);
 												}
 											}
 											if(this.aggr == 0)
@@ -752,10 +781,10 @@ public class Select extends SQLRequest{
 											count++;
 											for(int a:indexoftargetcol_onetable){
 												if(this.aggr == 0) {
-													System.out.print(tmp_lr.data[a] + "  ");
+													System.out.printf("%20s", tmp_lr.data[a]);
 												} else if(this.aggr == 2) {
-													int tmp = Integer.parseInt(tmp_lr.data[a]);
-													sum += tmp;
+													if(table0datatype[a].equals("int"))
+														sum += Integer.parseInt(tmp_lr.data[a]);
 												}
 											}
 											if(this.aggr == 0)
@@ -787,7 +816,7 @@ public class Select extends SQLRequest{
 				tn1_allRow = ct.return_colList(tablename1);
 				table0colname = ct.getColName(tablename0);
 				table1colname = ct.getColName(tablename1);
-				indexoftargetcol_twotable= new ArrayList<List<Integer>>();
+				indexoftargetcol_twotable = new ArrayList<List<Integer>>();
 				
 				for(List<String> targetcol : this.colName){
 					tmpc = 0;
@@ -834,13 +863,13 @@ public class Select extends SQLRequest{
 									for(List<Integer> a:indexoftargetcol_twotable){
 										int t = a.get(1); // 哪個table
 										if(t==0){
-											System.out.print(tmp_lr0.data[a.get(0)] + "  ");
+											System.out.printf("%20s", tmp_lr0.data[a.get(0)]);
 										}else if(t==1){
-											System.out.print(tmp_lr1.data[a.get(0)] + "  ");
+											System.out.printf("%20s", tmp_lr1.data[a.get(0)]);
 											
 										}
 									}
-									System.out.print("\n");
+									System.out.println();
 								}
 							}
 							break;
@@ -909,9 +938,9 @@ public class Select extends SQLRequest{
 																	for(List<Integer> a:indexoftargetcol_twotable){
 																		int t = a.get(1); // 哪個table
 																		if(t==0){
-																			System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																		}else if(t==1){
-																			System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																			
 																		}
 																	}
@@ -922,9 +951,9 @@ public class Select extends SQLRequest{
 																	for(List<Integer> a:indexoftargetcol_twotable){
 																		int t = a.get(1); // 哪個table
 																		if(t==0){
-																			System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																		}else if(t==1){
-																			System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																			
 																		}
 																	}
@@ -937,9 +966,9 @@ public class Select extends SQLRequest{
 																	for(List<Integer> a:indexoftargetcol_twotable){
 																		int t = a.get(1); // 哪個table
 																		if(t==0){
-																			System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																		}else if(t==1){
-																			System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																			
 																		}
 																	}
@@ -950,9 +979,9 @@ public class Select extends SQLRequest{
 																	for(List<Integer> a:indexoftargetcol_twotable){
 																		int t = a.get(1); // 哪個table
 																		if(t==0){
-																			System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																		}else if(t==1){
-																			System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																			System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																			
 																		}
 																	}
@@ -981,14 +1010,12 @@ public class Select extends SQLRequest{
 											case 2:
 												count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
+
 														if(!tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1007,9 +1034,9 @@ public class Select extends SQLRequest{
 																		for(List<Integer> a:indexoftargetcol_twotable){
 																			int t = a.get(1); // 哪個table
 																			if(t==0){
-																				System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																			}else if(t==1){
-																				System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																				
 																			}
 																		}
@@ -1020,9 +1047,9 @@ public class Select extends SQLRequest{
 																		for(List<Integer> a:indexoftargetcol_twotable){
 																			int t = a.get(1); // 哪個table
 																			if(t==0){
-																				System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																			}else if(t==1){
-																				System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																				
 																			}
 																		}
@@ -1035,9 +1062,9 @@ public class Select extends SQLRequest{
 																		for(List<Integer> a:indexoftargetcol_twotable){
 																			int t = a.get(1); // 哪個table
 																			if(t==0){
-																				System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																			}else if(t==1){
-																				System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																				
 																			}
 																		}
@@ -1048,9 +1075,9 @@ public class Select extends SQLRequest{
 																		for(List<Integer> a:indexoftargetcol_twotable){
 																			int t = a.get(1); // 哪個table
 																			if(t==0){
-																				System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																			}else if(t==1){
-																				System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																				System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																				
 																			}
 																		}
@@ -1077,14 +1104,11 @@ public class Select extends SQLRequest{
 							 				case 2:
 												count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 														if(tmp_lr.data[targetindex0].equalsIgnoreCase(tmp_lr.data[targetindex1])) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1127,9 +1151,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1141,9 +1165,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1168,14 +1192,11 @@ public class Select extends SQLRequest{
 						 					case 2:
 												count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 										 				if(!tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1192,9 +1213,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1206,9 +1227,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1233,14 +1254,11 @@ public class Select extends SQLRequest{
 						 					case 2:
 												count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 										 				if(tmp_lr.data[targetindex0].equalsIgnoreCase(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1283,9 +1301,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1297,9 +1315,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1323,14 +1341,11 @@ public class Select extends SQLRequest{
 						 					case 2:
 						 						count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 														if(Integer.parseInt(tmp_lr.data[targetindex0]) != Integer.parseInt(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1347,9 +1362,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1361,9 +1376,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1387,14 +1402,11 @@ public class Select extends SQLRequest{
 											case 2:
 						 						count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 														if(Integer.parseInt(tmp_lr.data[targetindex0]) < Integer.parseInt(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1411,9 +1423,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1425,9 +1437,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1451,14 +1463,11 @@ public class Select extends SQLRequest{
 											case 2:
 						 						count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 														if(Integer.parseInt(tmp_lr.data[targetindex0]) > Integer.parseInt(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -1475,9 +1484,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1489,9 +1498,9 @@ public class Select extends SQLRequest{
 																for(List<Integer> a:indexoftargetcol_twotable){
 																	int t = a.get(1); // 哪個table
 																	if(t==0){
-																		System.out.print(tmp_lr.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 																	}else if(t==1){
-																		System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+																		System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 																		
 																	}
 																}
@@ -1515,14 +1524,11 @@ public class Select extends SQLRequest{
 											case 2:
 						 						count = 0;
 												for(TableList.row_node tmp_lr : tn0_allRow){
-													int i = 0;
 													for(int a:indexoftargetcol_onetable){
-														int tmp = Integer.parseInt(tmp_lr.data[a]);
 														if(Integer.parseInt(tmp_lr.data[targetindex0]) == Integer.parseInt(condition0.valueRight)) {
-															if(table0datatype[i].equals("int")) 
-																count += tmp;
+															if(table0datatype[a].equals("int")) 
+																count += Integer.parseInt(tmp_lr.data[a]);
 														}
-														i++;
 													}
 												}
 												System.out.println(count);
@@ -2177,9 +2183,9 @@ public class Select extends SQLRequest{
 												for(List<Integer> a:indexoftargetcol_twotable){
 													int t = a.get(1); // 哪個table
 													if(t==0){
-														System.out.print(tmp_lr.data[a.get(0)] + "  ");
+														System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 													}else if(t==1){
-														System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+														System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 														
 													}
 												}
@@ -2200,9 +2206,9 @@ public class Select extends SQLRequest{
 												for(List<Integer> a:indexoftargetcol_twotable){
 													int t = a.get(1); // 哪個table
 													if(t==0){
-														System.out.print(tmp_lr.data[a.get(0)] + "  ");
+														System.out.printf("%20s", tmp_lr.data[a.get(0)]);
 													}else if(t==1){
-														System.out.print(tmp_lr2.data[a.get(0)] + "  ");
+														System.out.printf("%20s", tmp_lr2.data[a.get(0)]);
 														
 													}
 												}
@@ -2293,7 +2299,7 @@ public class Select extends SQLRequest{
 				}
 				cs.indexLeft = false;
 				TableList.table_node tn = Main.ct.checktablename(cs.tableLeft);
-				if(Main.ct.checkIndex(tn, left)) {
+				if(Main.ct.checkIndex(tn, cs.valueLeft)) {
 					cs.indexLeft = true;
 				}
 			}
@@ -2330,7 +2336,7 @@ public class Select extends SQLRequest{
 				}
 				cs.indexRight = false;
 				TableList.table_node tn = Main.ct.checktablename(cs.tableRight);
-				if(Main.ct.checkIndex(tn, left)) {
+				if(Main.ct.checkIndex(tn, cs.valueRight)) {
 					cs.indexRight = true;
 				}
 			}
@@ -2389,16 +2395,15 @@ public class Select extends SQLRequest{
 	private int innerCheck(String a, int count, String type) {
 		switch(this.aggr) {
 		case 0:
-			System.out.print(a + "  ");
+			System.out.printf("%20s",a);
 			break;
 		case 1:
 			if(a != null)
 				count++;
 			break;
 		case 2:
-			int tmp = Integer.parseInt(a);
 			if(type.equals("int")) 
-				count += tmp;
+				count += Integer.parseInt(a);
 		}
 		return count;
 	}
@@ -2417,8 +2422,8 @@ public class Select extends SQLRequest{
 		ConditionStruct cs2 = null;
 		Index in1;
 		Index in2;
-		List<TableList.row_node> l1 = null;
-		List<TableList.row_node> l2 = null;
+		List<TableList.row_node> l1 = new ArrayList<TableList.row_node>();
+		List<TableList.row_node> l2 = new ArrayList<TableList.row_node>();
 		String[] cn;
 		
 		switch(this.tableName.size()) {
@@ -2445,11 +2450,11 @@ public class Select extends SQLRequest{
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
 							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
-							twoCond_oneIndex(l1, cs2);
+							twoCond_oneIndex(l1,null, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
 							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
-							twoCond_oneIndex(l1, cs1);
+							twoCond_oneIndex(l1,null, cs1);
 						}						
 						break;	// end two cond
 				}
@@ -2460,9 +2465,13 @@ public class Select extends SQLRequest{
 
 				//int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
 				int count = 0;
+				int num = this.colName.size();					
 				for(TableList.row_node t : l1) {
 					for(List<String> ls: this.colName) {
 						if(ls.get(1).equals("*")) {
+							if(count == 0) {
+								num += cn.length-1;
+							}
 							for(int i = 0; i < cn.length; i++) {
 								count = innerCheck(t.data[i], count, type[i]);
 							}
@@ -2474,32 +2483,35 @@ public class Select extends SQLRequest{
 					if(this.aggr == 0)
 						System.out.println();
 				}
-				if(this.aggr != 0)
+				if(this.aggr == 1)
+					System.out.println(count/num);
+				if(this.aggr == 2)
 					System.out.println(count);
 				
 				break;	// end one table
 			case 2:	// two table
 				
-				List<String> cn1 = Arrays.asList(Main.ct.getColName(this.tableName.get(0).get(1)));
-				List<String> cn2 = Arrays.asList(Main.ct.getColName(this.tableName.get(1).get(1)));
+				List<String> cn1 = Arrays.asList(Main.ct.getColName(this.tableName.get(0).get(0)));
+				List<String> cn2 = Arrays.asList(Main.ct.getColName(this.tableName.get(1).get(0)));
 				List<Integer> resultColIndex1 = new ArrayList<Integer>();
 				List<Integer> resultColIndex2 = new ArrayList<Integer>();
 				
 				for(List<String> ls: this.colName){
 					if(!ls.get(1).equals("*")) {
-						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(1))) {
+						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(0))) {
 							resultColIndex1.add(cn1.indexOf(ls.get(1)));
-						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(1))) {
-							resultColIndex2.add(cn2.indexOf(ls.get(1)));
+						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(0))) {
+							int t = cn2.indexOf(ls.get(1));
+							resultColIndex2.add(t);
 						}
 					} else {
-						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(1))) {
+						if(ls.get(0).equalsIgnoreCase(this.tableName.get(0).get(0))) {
 							for(int i = 0; i < cn1.size(); i++) {
 								resultColIndex1.add(i);
 							}
-						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(1))) {
+						} else if(ls.get(0).equalsIgnoreCase(this.tableName.get(1).get(0))) {
 							for(int i = 0; i < cn2.size(); i++) {
-								resultColIndex1.add(i);
+								resultColIndex2.add(i);
 							}
 						}
 					}
@@ -2510,9 +2522,15 @@ public class Select extends SQLRequest{
 						cs1 = this.condition.get(0);
 						if(cs1.indexLeft && cs1.typeRight != 0) {
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							List<TableList.row_node> tmp = getCondResult(in1, cs1);
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
 							for(TableList.row_node rn: tmp) {
-								List<TableList.row_node> lr = Main.ct.return_colList(cs1.tableRight);
+								String tb = new String();
+								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
+									tb = this.tableName.get(1).get(0);
+								} else {
+									tb = this.tableName.get(0).get(0);
+								}
+								List<TableList.row_node> lr = Main.ct.return_colList(tb);
 								for(int i = 0; i < lr.size(); i++)
 									l1.add(rn);
 								l2.addAll(lr);
@@ -2527,42 +2545,86 @@ public class Select extends SQLRequest{
 						if(cs1.valueLeft.equals(cs2.valueLeft) && cs1.tableLeft.equals(cs2.tableLeft) &&
 								cs1.indexLeft) {	// two condition use same col which is index
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
 							l2 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
-							uni_or_inter(l1, l2);
+							uni_or_inter(tmp, l2);
+							l2 = new ArrayList<TableList.row_node>();
+							for(TableList.row_node rn: tmp) {
+								String tb = new String();
+								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
+									tb = this.tableName.get(1).get(0);
+								} else {
+									tb = this.tableName.get(0).get(0);
+								}
+								List<TableList.row_node> lr = Main.ct.return_colList(tb);
+								for(int i = 0; i < lr.size(); i++)
+									l1.add(rn);
+								l2.addAll(lr);
+							}
+							
 						} else if(cs1.indexLeft) {	// first condition use index only
 							in1 = Main.indexlist.getIndex(cs1.tableLeft, cs1.valueLeft);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
-							twoCond_oneIndex(l1, cs2);
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs1));
+							for(TableList.row_node rn: tmp) {
+								String tb = new String();
+								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
+									tb = this.tableName.get(1).get(0);
+								} else {
+									tb = this.tableName.get(0).get(0);
+								}
+								List<TableList.row_node> lr = Main.ct.return_colList(tb);
+								for(int i = 0; i < lr.size(); i++)
+									l1.add(rn);
+								l2.addAll(lr);
+							}
+							twoCond_oneIndex(l1, l2, cs2);
 						} else if(cs2.indexLeft) {	// second condition use index only
 							in1 = Main.indexlist.getIndex(cs2.tableRight, cs2.valueRight);
-							l1 = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
-							twoCond_oneIndex(l1, cs1);
+							List<TableList.row_node> tmp = new ArrayList<TableList.row_node>(getCondResult(in1, cs2));
+							for(TableList.row_node rn: tmp) {
+								String tb = new String();
+								if(this.tableName.get(0).get(0).equals(cs1.tableLeft)) {
+									tb = this.tableName.get(1).get(0);
+								} else {
+									tb = this.tableName.get(0).get(0);
+								}
+								List<TableList.row_node> lr = Main.ct.return_colList(tb);
+								for(int i = 0; i < lr.size(); i++)
+									l1.add(rn);
+								l2.addAll(lr);
+							}
+							twoCond_oneIndex(l1, l2, cs1);
 						}	
 						
 						
 						break;
 				}
 				cn = Main.ct.getColName(cs1.tableLeft);
-				String[] type1 = Main.ct.getDataType(this.tableName.get(0).get(1));
-				String[] type2 = Main.ct.getDataType(this.tableName.get(1).get(1));
+				String[] type1 = Main.ct.getDataType(this.tableName.get(0).get(0));
+				String[] type2 = Main.ct.getDataType(this.tableName.get(1).get(0));
 
 				//int a = Main.ct.checktablename(cs1.tableLeft).getColumnIndex(cs1.valueLeft);
 				int count2 = 0;
 				int j = 0;
 				for(TableList.row_node t : l1) {
 					for(Integer id: resultColIndex1) {
-						count2 = innerCheck(t.data[id], count2, type1[id]);
+						if(cs1.tableLeft.equals(this.tableName.get(0).get(0)))
+							count2 = innerCheck(t.data[id], count2, type2[id]);
+						else
+							count2 = innerCheck(l2.get(j).data[id], count2, type1[id]);
 					}
 					for(Integer id: resultColIndex2) {
-						count2 = innerCheck(l2.get(j).data[id], count2, type2[id]);
+						if(cs1.tableLeft.equals(this.tableName.get(0).get(0)))
+							count2 = innerCheck(l2.get(j).data[id], count2, type2[id]);
+						else
+							count2 = innerCheck(t.data[id], count2, type1[id]);
 					}
 					if(this.aggr == 0)
 						System.out.println();
 					j++;
 				}
 				if(this.aggr == 1)
-					System.out.println(count2/resultColIndex1.size());
+					System.out.println(count2/(resultColIndex1.size()+resultColIndex2.size()));
 				if(this.aggr == 2)
 					System.out.println(count2);
 				
@@ -2585,7 +2647,7 @@ public class Select extends SQLRequest{
 		case 3:	// equal
 			return i.btree.get(integer);
 		default:
-			return null;
+			return new ArrayList<TableList.row_node>();
 		}
 	}
 	
@@ -2599,37 +2661,54 @@ public class Select extends SQLRequest{
 			break;
 		}
 	}
-	private void twoCond_oneIndex(List<TableList.row_node> l1,ConditionStruct cs2) {
+	private void twoCond_oneIndex(List<TableList.row_node> l1,List<TableList.row_node> l2, ConditionStruct cs2) {
 		int a = Main.ct.checktablename(cs2.tableLeft).getColumnIndex(cs2.valueLeft);
-		
-		
+		int j = 0;
+		int i = 0;
 		switch(this.op) {
 		case 1:	// AND
-				for(Object o: l1) {
-					TableList.row_node rn = (TableList.row_node)o;
+			List<TableList.row_node> lr = new ArrayList<TableList.row_node>(l1);
+			i = 0;
+				for(Object o: lr) {
+					TableList.row_node rn1 = (TableList.row_node)o;
+					TableList.row_node rn2 = l2.get(j);
+					TableList.row_node rn;
+					if(cs2.tableLeft.equalsIgnoreCase(this.tableName.get(0).get(0))) {
+						rn = rn2;
+					} else {
+						rn = rn1;
+					}
 					switch(cs2.typeRight){
 					case 0:
+						TableList.row_node rn3;
+						if(cs2.tableRight.equalsIgnoreCase(this.tableName.get(0).get(0))) {
+							rn3 = rn1;
+						} else {
+							rn3 = rn2;
+						}
 						int b = Main.ct.checktablename(cs2.tableRight).getColumnIndex(cs2.valueRight);
 						String type = cs2.dataLeft;
 						if(type.equals("int")){
-							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							if(!rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 0) {
 								continue;
-							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn.data[b]) && cs2.operator == 1) {
+							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn3.data[b]) && cs2.operator == 1) {
 								continue;
-							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn.data[b]) && cs2.operator == 2) {
+							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn3.data[b]) && cs2.operator == 2) {
 								continue;
-							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								continue;
 							} else {
 								l1.remove(o);
+								l2.remove(i);
 							}
 						}else if(type.equals("varchar")){
-							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							if(!rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 0) {
 								continue;
-							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								continue;
 							} else {
 								l1.remove(o);
+								l2.remove(i);
 							}
 						}
 						break;
@@ -2640,6 +2719,7 @@ public class Select extends SQLRequest{
 							continue;
 						} else {
 							l1.remove(o);
+							l2.remove(i);
 						}
 						break;
 					case 2:
@@ -2654,65 +2734,94 @@ public class Select extends SQLRequest{
 							continue;
 						} else {
 							l1.remove(o);
+							l2.remove(i);
 						}
 						break;
 						
 					
 					}
-					
+					i++;	
 				}
 			break;
 		case 2:	// OR
-				List<TableList.row_node> row_list = Main.ct.return_colList(cs2.tableLeft);
+			//List<TableList.row_node> lr = new ArrayList<TableList.row_node>(l1);
+			i = 0;
+			
+				List<TableList.row_node> row_list = null;
+				List<TableList.row_node> row_list2 = null;
+				if(cs2.tableLeft.equalsIgnoreCase(this.tableName.get(0).get(0))) {
+					row_list = Main.ct.return_colList(this.tableName.get(0).get(0));
+					row_list2 = Main.ct.return_colList(this.tableName.get(1).get(0));
+				} else if(cs2.tableLeft.equalsIgnoreCase(this.tableName.get(1).get(0))) {
+					row_list = Main.ct.return_colList(this.tableName.get(1).get(0));
+					row_list2 = Main.ct.return_colList(this.tableName.get(0).get(0));
+				}
 				List<TableList.row_node> tmp = new ArrayList<TableList.row_node>();
-				for(TableList.row_node rn : row_list) {
-					
+				List<TableList.row_node> tmp2 = new ArrayList<TableList.row_node>();
+				for(TableList.row_node rn : row_list) {	
+					TableList.row_node rn3 = row_list.get(i);
+
 					switch(cs2.typeRight){
 					case 0:
 						int b = Main.ct.checktablename(cs2.tableRight).getColumnIndex(cs2.valueRight);
 						String type = cs2.dataLeft;
 						if(type.equals("int")){
-							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							if(!rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 0) {
 								tmp.add(rn);
-							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn.data[b]) && cs2.operator == 1) {
+								tmp2.add(rn3);
+							} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(rn3.data[b]) && cs2.operator == 1) {
 								tmp.add(rn);
-							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn.data[b]) && cs2.operator == 2) {
+								tmp2.add(rn3);
+							} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(rn3.data[b]) && cs2.operator == 2) {
 								tmp.add(rn);
-							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								tmp2.add(rn3);
+							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								tmp.add(rn);
+								tmp2.add(rn3);
 							}
 						} else if(type.equals("varchar")){
-							if(!rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 0) {
+							if(!rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 0) {
 								tmp.add(rn);
-							} else if(rn.data[a].equalsIgnoreCase(rn.data[b]) && cs2.operator == 3) {
+								tmp2.add(rn3);
+							} else if(rn.data[a].equalsIgnoreCase(rn3.data[b]) && cs2.operator == 3) {
 								tmp.add(rn);
+								tmp2.add(rn3);
 							}
 						}
 						break;
 					case 1:
 						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						}
 						break;
 					case 2:
 					
 						if(!rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 0) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						} else if(Integer.parseInt(rn.data[a]) < Integer.parseInt(cs2.valueRight) && cs2.operator == 1) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						} else if(Integer.parseInt(rn.data[a]) > Integer.parseInt(cs2.valueRight) && cs2.operator == 2) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						} else if(rn.data[a].equalsIgnoreCase(cs2.valueRight) && cs2.operator == 3) {
 							tmp.add(rn);
+							tmp2.add(rn3);
 						}
 						break;
 					}
+					i++;
 					
 				}
 				l1.removeAll(tmp);
 				l1.addAll(tmp);
+				l2.remove(tmp2);
+				l2.addAll(tmp2);
 			
 			break;
 		}
